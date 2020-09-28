@@ -2,4 +2,5 @@ adjustText
 ipykernel
 nbsphinx
 numpy
+pandas
 matplotlib
