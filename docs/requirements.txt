@@ -1,0 +1,5 @@
+adjustText
+ipykernel
+nbsphinx
+numpy
+matplotlib

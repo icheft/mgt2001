@@ -5,11 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mgt2001",
-    version="0.0.2",
+    version="0.0.3",
     author="Brian L. Chen",
     author_email="brian.lxchen@gmail.com",
     description="A small package for MGT 2001 use only",
-    long_description="A small package for MGT 2001 use only",
     long_description_content_type="text/markdown",
     url="https://github.com/icheft/MGT2001_package",
     packages=setuptools.find_packages(),
@@ -19,4 +18,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
+    install_requires=['numpy', 'matplotlib', 'adjustText'],
+    include_package_data=True,
 )
