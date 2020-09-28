@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="mgt2001-icheft",
+    name="mgt2001",
     version="0.0.1",
     author="Brian L. Chen",
     author_email="brian.lxchen@gmail.com",
