@@ -1,0 +1,7 @@
+README.md
+setup.py
+mgt2001/__init__.py
+mgt2001.egg-info/PKG-INFO
+mgt2001.egg-info/SOURCES.txt
+mgt2001.egg-info/dependency_links.txt
+mgt2001.egg-info/top_level.txt
