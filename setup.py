@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mgt2001",
-    version="0.0.7",
+    version="0.0.8",
     author="Brian L. Chen",
     author_email="brian.lxchen@gmail.com",
     description="A small package for MGT 2001 use only",
