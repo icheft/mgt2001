@@ -24,9 +24,6 @@ def autolabel(rects, **kwargs):
     if "original" in kwargs and kwargs["original"] == True:
         ori_autolabel(rects)
         return
-    
-    if "direct" in kwargs and kwargs["direct"] == True: 
-        adjust_text(rects)
 
     texts = []
     for rect in rects:
