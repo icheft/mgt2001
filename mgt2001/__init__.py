@@ -24,6 +24,9 @@ def autolabel(rects, **kwargs):
     if "original" in kwargs and kwargs["original"] == True:
         ori_autolabel(rects)
         return
+    
+    if "direct" in kwargs and kwargs["direct"] == True: 
+        adjust_text(rects)
 
     texts = []
     for rect in rects:
@@ -32,10 +35,9 @@ def autolabel(rects, **kwargs):
                     x=(rect.get_x() + rect.get_width() / 2),
                     y=(height)))
 
+    
     if "arrowprops" in kwargs:
         adjust_text(texts, arrowprops=kwargs['arrowprops'])
-    else: 
-        adjust_text(texts)
 
 
 def color_palette(n, cmap="jet"):
