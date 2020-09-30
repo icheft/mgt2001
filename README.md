@@ -18,6 +18,9 @@
 </p>
 
 ## Intro
+
+[![Join the chat at https://gitter.im/icheft/MGT2001](https://badges.gitter.im/icheft/MGT2001.svg)](https://gitter.im/icheft/MGT2001?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 The goal for this python package is to provide NTUIM students with an easier solution for everything. This can be labelling issues in bar charts, generating a set of colors, and many more. Throughout the course, we hope to fill this package with useful and handy functions that can be used in the assignments, quizzes, and probably even for the future projects. 
 
 ## Getting Started
