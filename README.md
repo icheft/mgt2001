@@ -8,6 +8,12 @@
 
 <h4 align="center">A small package for MGT 2001 use only.</h4>
 
+<p align="center">
+  <a href="https://gitter.im/icheft/MGT2001">
+    <img src="https://badges.gitter.im/icheft/MGT2001.svg"
+         alt="Join the chat at https://gitter.im/icheft/MGT2001">
+  </a>
+</p>
 
 <p align="center">
   <a href="#demo">Intro</a> •
