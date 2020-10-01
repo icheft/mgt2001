@@ -45,3 +45,27 @@ def color_palette(n, cmap="jet"):
 
     get_color = getattr(cm, cmap)
     return get_color(np.linspace(0,1,n))
+
+
+class Pos():
+    # positioning - src: http://emptypipes.org/2013/11/09/matplotlib-multicategory-barchart/
+    def __init__(self, groupedN, seriesN, space=0.3):
+        self.space = space
+        self.groupedN = groupedN
+        self.seriesN = seriesN
+        self.width = (1 - self.space) / (self.groupedN)
+        self.__calcPos()
+
+    def __calcPos(self):
+        self.pos = list()
+        for i in range(self.seriesN):
+            self.pos.append([j - (1 - self.space) / 2. + i * self.width for j in range(1,self.groupedN+1)])
+
+    def returnPos(self):
+        return self.pos
+
+    def restructure(self, groupedN, seriesN):
+        self.groupedN = groupedN
+        self.seriesN = seriesN
+        self.width = (1 - self.space) / (self.groupedN)
+        self.__calcPos()
