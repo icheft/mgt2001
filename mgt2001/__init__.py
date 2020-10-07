@@ -3,7 +3,22 @@ import matplotlib.cm as cm
 import matplotlib.gridspec as gridspec
 import pandas as pd
 import numpy as np
+import math as math
 from adjustText import adjust_text
+
+
+def geomean(rate):
+    """
+    Result: Will return the geometric mean
+
+    Usage:
+    return_rate = np.array([0.2, 0.1, -0.05])
+    avg_rate = geomean(return_rate)
+    print("geo_mean =", avg_rate)
+    """
+    rate_1 = rate + 1
+    geo_m = math.exp(np.log(rate_1).mean()) - 1
+    return geo_m
 
 
 def ori_autolabel(rects, truncate='{}'):
