@@ -1,11 +1,26 @@
+#!/usr/bin/env python
 import setuptools
+import os
+from setuptools import setup
+
+
+def get_version(path):
+    with open(path, "r") as f:
+        _, version = f.read().strip().split("=")
+        version = version.strip().strip('"')
+    return version
+
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="mgt2001",
-    version="0.0.22",
+    version=get_version(os.path.join(
+        ".",  # os.path.dirname(os.path.realpath(__file__)),
+        "mgt2001",
+        "_version.py",
+    )),
     author="Brian L. Chen",
     author_email="brian.lxchen@gmail.com",
     description="A small package for MGT 2001 use only",
