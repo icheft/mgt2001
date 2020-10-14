@@ -9,9 +9,9 @@ def outlier(data):
     Q3 = per.percentile(data, 75)
     IQR = Q3 - Q1  # IQR is interquartile range.
     filter = (data < Q1 - 1.5 * IQR) | (data > Q3 + 1.5 * IQR)
-    if (filter.size != 0):
+    if (len(data.loc[filter].to_list()) != 0):
         outlier_prompt = "Outliers are listed as follows:\n{}".format(
-            data.loc[filter])
+            data.loc[filter].to_list())
     else:
         outlier_prompt = "There are no outliers."
 
