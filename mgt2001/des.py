@@ -3,10 +3,45 @@ import math as math
 import mgt2001.per as per
 
 
-def outlier(data):
-    Q1 = per.percentile(data, 25)
-    Q2 = per.percentile(data, 50)
-    Q3 = per.percentile(data, 75)
+def outlier(data, base=per):
+    """
+    The default is set to per.percentile()
+
+    Usages
+    ------
+    >>> df = whatever DataFrame you construct
+    >>> per.outlier(df["column_name"], per) # to use per.percentile (textbook) to compute quartiles
+    >>> per.outlier(df["column_name"], np) # to use np.percentile to compute quartiles
+
+    Examples
+    ------
+    In HW04, 4.73, the results could be different:
+    >>> per.outlier(df["Time_Public"].dropna(), np)
+    Quartiles for playing on a public course:
+
+    Q1 = 279.5
+    Q2 = 296.0
+    Q3 = 307.0
+    IQR = 27.5
+
+    Outliers are listed as follows:
+    [238.0, 359.0]
+
+    >>> per.outlier(df["Time_Public"].dropna()) # default = per
+    Quartiles for playing on a public course:
+
+    Q1 = 279.0
+    Q2 = 296.0
+    Q3 = 307.0
+    IQR = 28.0
+
+    Outliers are listed as follows:
+    [359.0]
+
+    """
+    Q1 = base.percentile(data, 25)
+    Q2 = base.percentile(data, 50)
+    Q3 = base.percentile(data, 75)
     IQR = Q3 - Q1  # IQR is interquartile range.
     filter = (data < Q1 - 1.5 * IQR) | (data > Q3 + 1.5 * IQR)
     if (len(data.loc[filter].to_list()) != 0):
