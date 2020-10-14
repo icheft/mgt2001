@@ -8,10 +8,6 @@ def outlier(data):
     Q2 = per.percentile(data, 50)
     Q3 = per.percentile(data, 75)
     IQR = Q3 - Q1  # IQR is interquartile range.
-    print("Q1 = ", Q1)
-    print("Q2 = ", Q2)
-    print("Q3 = ", Q3)
-    print("IQR = ", IQR)
     filter = (data < Q1 - 1.5 * IQR) | (data > Q3 + 1.5 * IQR)
     if (filter.size != 0):
         outlier_prompt = "Outliers are listed as follows:\n{}".format(
