@@ -13,7 +13,7 @@ def outlier(data):
     print("Q3 = ", Q3)
     print("IQR = ", IQR)
     filter = (data < Q1 - 1.5 * IQR) | (data > Q3 + 1.5 * IQR)
-    if (not filter):
+    if (filter.size != 0):
         outlier_prompt = "Outliers are listed as follows:\n{}".format(
             data.loc[filter])
     else:
