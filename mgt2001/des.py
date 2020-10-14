@@ -19,12 +19,13 @@ def outlier(data):
     else:
         outlier_prompt = "There are no outliers."
 
-    description = """Q1 = {}
-    Q2 = {}
-    Q3 = {}
-    IQR = {}
+    description = """
+Q1 = {}
+Q2 = {}
+Q3 = {}
+IQR = {}
 
-    {}
+{}
     """.format(Q1, Q2, Q3, IQR, outlier_prompt)
 
     return description
