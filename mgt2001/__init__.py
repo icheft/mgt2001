@@ -6,6 +6,10 @@ import numpy as np
 import math as math
 from adjustText import adjust_text
 
+import mgt2001.per as per
+import mgt2001.des as des
+import mgt2001.notes as notes
+
 
 def geomean(rate):
     """

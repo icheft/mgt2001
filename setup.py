@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mgt2001",
-    version="0.0.16",
+    version="0.0.17",
     author="Brian L. Chen",
     author_email="brian.lxchen@gmail.com",
     description="A small package for MGT 2001 use only",
@@ -18,6 +18,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    install_requires=['numpy', 'pandas', 'matplotlib', 'adjustText'],
+    install_requires=['numpy', 'pandas', 'matplotlib', 'adjustText', 'scipy'],
     include_package_data=True,
 )
