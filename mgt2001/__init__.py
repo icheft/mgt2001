@@ -41,7 +41,12 @@ def ori_autolabel(rects, truncate='{}'):
 def autolabel(rects, **kwargs):
     """
     Attach a text label above each bar in *rects*, displaying its height.
-    Only *arrowprops* is available right now.
+
+    list of kwargs:
+        + bool original
+        + string truncate: in the '{}' format. Can be filled in with '{:.5f}'
+        + dict arrowprops:
+            usage: pass in `arrowprops=dict(arrowstyle='->', color='r')`
     """
     if "original" in kwargs and kwargs["original"] == True:
         if "truncate" in kwargs:

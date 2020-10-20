@@ -28,6 +28,9 @@ def percentile(data, percentage):
 
 
 def percentrank(data, value):
+    """
+    Will return the corresponding percentile rank given the value.
+    """
     if type(data) == np.ndarray:
         all_data = data.copy()
         data = data.copy()
