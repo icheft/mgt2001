@@ -10,6 +10,8 @@ import mgt2001.per as per
 import mgt2001.des as des
 import mgt2001.notes as notes
 
+from mgt2001._version import __version__
+
 
 def geomean(rate):
     """
