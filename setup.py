@@ -33,6 +33,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    install_requires=['numpy', 'pandas', 'matplotlib', 'adjustText', 'scipy'],
+    install_requires=['numpy', 'pandas', 'matplotlib',
+                      'adjustText', 'scipy', 'ete3', 'seaborn'],
     include_package_data=True,
 )

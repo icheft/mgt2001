@@ -9,6 +9,7 @@ from adjustText import adjust_text
 import mgt2001.per as per
 import mgt2001.des as des
 import mgt2001.notes as notes
+import mgt2001.tree as tree
 
 from mgt2001._version import __version__
 
