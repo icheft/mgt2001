@@ -71,6 +71,25 @@ def README():
     + `skew(df)`: return the skewness of the df col
     + `convert_excel_skew(G, n)`: will return the real skewness; n being the number of samples
 
+    ----------------
+
+    ## `prob.py`
+
+    + `BayesTHM(pre_probs, event='D')`: 
+        Output: (Bayes):
+        >>> [num1, num2] >> meaning that given event B has occurred, the probability that the previous event occurred is num1
+        ============
+        Input:
+        >>> BayesTHM(np.array[[0.9, 0.1], # being the previous conditions
+                                  [0.99, 0.9], # being the conditional probabilities: ([P(B | A), P(B | A̅)])
+                                  [0.01, 0.1]]) # being the complementaries of the conditional probabilities: ([P(B̅ | A), P(B̅ | A̅)])
+
+        The deafult number of columns is 2.
+
+        Pass in `event='B'` to specify the post event you are to compare.
+
+    ----------------
+
     ## `notes.py`
     Here are a list of notes:
     + measure_of_movement
