@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import html
 
 
@@ -46,3 +47,59 @@ The Bayes probability given the post event {i}:
 {bayes}
         """.format(i=events[i], p_c_sum=p_c_sums[i], bayes=bayes[i, ])
         print(to_print)
+
+
+def portfolio_analysis(stock_df, target_stocks, pss):
+    """
+    Usage:
+    df = pd.read_excel('Xr07-TSE.xlsx')
+    df = df.set_index(['Year', 'Month'])
+    month_dict = {'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6, 'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12}
+    df.rename(index=month_dict, inplace=True)
+
+    target_stocks = ['BMO', 'MG', 'POW', 'RCL.B']
+    pss = np.array([[.25, .25, .25, .25], [.2,.6, .1, .1], [.1, .2, .3, .4]])
+
+    portfolios = portfolio_analysis(df[target_stocks], target_stocks, pss)
+
+    --------------------
+    cov_mat = np.cov(stock_df[target_stocks].values, rowvar=False) # [i, i] = variance of each stock
+    cor_mat = np.corrcoef(df[target_stocks].values, rowvar = False)
+    """
+
+    NUMOFSTOCKS = len(target_stocks)
+    NUMOFPORT = len(pss)
+
+    cov_mat = np.cov(stock_df[target_stocks].values, rowvar=False)
+    stock_des = pd.DataFrame(
+        data=cov_mat, columns=target_stocks, index=target_stocks)
+    stock_des.loc['Expected Returns'] = stock_df.mean()
+
+    portfolios = [stock_des.copy() for i in range(NUMOFPORT)]
+    for i in range(NUMOFPORT):
+        portfolios[i].loc['Portfolio'] = pss[i]
+        portfolios[i]['Total'] = pd.Series(
+            data=(portfolios[i].loc['Portfolio'].sum()), index=['Portfolio'])
+
+    expected_values = [0 for i in range(NUMOFPORT)]
+    var = [0 for i in range(NUMOFPORT)]
+    std = list()
+
+    for i in range(NUMOFPORT):
+        expected_values[i] += (portfolios[i].loc['Portfolio']
+                               * portfolios[i].loc['Expected Returns']).sum()
+
+    for i in range(NUMOFPORT):
+        var[i] = np.dot(portfolios[i].loc['Portfolio'][0:4].to_numpy(), np.dot(
+            cov_mat, portfolios[i].loc['Portfolio'][0:4].to_numpy().transpose()))
+
+    std = [math.sqrt(var[i]) for i in range(NUMOFPORT)]
+
+    for i in range(NUMOFPORT):
+        result = """======== Portfolio {i} Return ========
+Expected Value:{tab}{tab}{exp:.7f}
+Variance:{tab}{tab}{var:.7f}
+Standard Deviation:{tab}{std:.7f}
+        """.format(tab='\t', i=i+1, exp=expected_values[i], var=var[i], std=std[i])
+        print(result)
+    return portfolios

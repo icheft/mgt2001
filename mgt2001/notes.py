@@ -87,6 +87,21 @@ def README():
         The deafult number of columns is 2.
 
         Pass in `event='B'` to specify the post event you are to compare.
+    + `portfolio_analysis(stock_df, target_stocks, pss)`:
+        Usage:
+        df = pd.read_excel('Xr07-TSE.xlsx')
+        df = df.set_index(['Year', 'Month'])
+        month_dict = {'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6, 'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12}
+        df.rename(index=month_dict, inplace=True)
+
+        target_stocks = ['BMO', 'MG', 'POW', 'RCL.B']
+        pss = np.array([[.25, .25, .25, .25], [.2,.6, .1, .1], [.1, .2, .3, .4]])
+
+        portfolios = portfolio_analysis(df[target_stocks], target_stocks, pss)
+
+        >> notes for np.cov and np.corrcoef
+        cov_mat = np.cov(stock_df[target_stocks].values, rowvar=False) # [i, i] = variance of each stock
+        cor_mat = np.corrcoef(df[target_stocks].values, rowvar = False)
 
     ----------------
 
