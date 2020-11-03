@@ -53,6 +53,8 @@ The Bayes probability given the post event {i}:
 
 def portfolio_analysis(stock_df, target_stocks, pss):
     """
+    Return list of portfolios
+
     Usage:
     df = pd.read_excel('Xr07-TSE.xlsx')
     df = df.set_index(['Year', 'Month'])
@@ -93,8 +95,8 @@ def portfolio_analysis(stock_df, target_stocks, pss):
                                * portfolios[i].loc['Expected Returns']).sum()
 
     for i in range(NUMOFPORT):
-        var[i] = np.dot(portfolios[i].loc['Weights'][0:4].to_numpy(), np.dot(
-            cov_mat, portfolios[i].loc['Weights'][0:4].to_numpy().transpose()))
+        var[i] = np.dot(portfolios[i].loc['Weights'][0:NUMOFSTOCKS].to_numpy(), np.dot(
+            cov_mat, portfolios[i].loc['Weights'][0:NUMOFSTOCKS].to_numpy().transpose()))
 
     std = [math.sqrt(var[i]) for i in range(NUMOFPORT)]
 

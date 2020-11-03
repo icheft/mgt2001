@@ -31,6 +31,37 @@ def color_list():
 
 def README():
     """
+    # TL;DR
+    List of mgt2001 functions (from mgt2001 import *):
+    + .
+        + geomean(rate)
+        + ori_autolabel(rects)
+        + autolabel(rects, **kwargs)
+        + color_palette(n, cmap='jet')
+        + add_margin(ax, x=0.05, y=.05)
+        + Pos()
+            + Pos().width
+            + Pos().returnPos()
+            + Pos().restructure
+    + per
+        + per.percentile(data, percentage)
+        + per.percentrank(data, value)
+    + des
+        + des.outlier(data, base=per) --> per = mgt.2001 per
+        + des.kurtosis(df)
+        + des.convert_excel_kurtosis(K, n)
+        + des.skew(df)
+        + des.convert_excel_skew(G, n)
+    + prob
+        + prob.BayesTHM(pre_probs, event='D')
+        + prob.portfolio_analysis(stock_df, target_stocks, pass)
+    + notes
+        + notes.measure_of_movement.__doc__
+        + notes.kurtosis.__doc__
+        + notes.skewness.__doc__
+        + notes.color_list.__doc__
+        + notes.README.__doc__
+
     ## `__init__.py`
     + `geomean(rate)`: return the geometric mean, rate being np.array()
     + `ori_autolabel(rects, truncate='{}')`: attach a text label above each bar in *rects*, truncate can be filled in like '{:.5f}'
@@ -88,6 +119,8 @@ def README():
 
         Pass in `event='B'` to specify the post event you are to compare.
     + `portfolio_analysis(stock_df, target_stocks, pss)`:
+        Return portfolios DataFrame as a list
+
         Usage:
         df = pd.read_excel('Xr07-TSE.xlsx')
         df = df.set_index(['Year', 'Month'])
