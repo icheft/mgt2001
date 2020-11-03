@@ -11,6 +11,9 @@ def get_version(path):
     return version
 
 
+installations = ['numpy', 'pandas', 'matplotlib', 'adjustText',
+                 'scipy', 'ete3', 'seaborn', 'stemgraphic', 'statsmodels', 'plotly']
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
@@ -33,7 +36,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    install_requires=['numpy', 'pandas', 'matplotlib',
-                      'adjustText', 'scipy', 'ete3', 'seaborn'],
+    install_requires=installations,
     include_package_data=True,
 )

@@ -2,6 +2,7 @@ import numpy as np
 import math
 import pandas as pd
 import html
+from mgt2001 import *
 
 
 def BayesTHM(pre_probs, event='D'):
@@ -74,25 +75,26 @@ def portfolio_analysis(stock_df, target_stocks, pss):
     cov_mat = np.cov(stock_df[target_stocks].values, rowvar=False)
     stock_des = pd.DataFrame(
         data=cov_mat, columns=target_stocks, index=target_stocks)
-    stock_des.loc['Expected Returns'] = stock_df.mean()
+    stock_des.loc['Expected Returns'] = [geomean(stock_df.iloc[:, i]) for i in range(
+        len(stock_df.columns))]  # stock_df.mean()
 
     portfolios = [stock_des.copy() for i in range(NUMOFPORT)]
     for i in range(NUMOFPORT):
-        portfolios[i].loc['Portfolio'] = pss[i]
+        portfolios[i].loc['Weights'] = pss[i]
         portfolios[i]['Total'] = pd.Series(
-            data=(portfolios[i].loc['Portfolio'].sum()), index=['Portfolio'])
+            data=(portfolios[i].loc['Weights'].sum()), index=['Weights'])
 
     expected_values = [0 for i in range(NUMOFPORT)]
     var = [0 for i in range(NUMOFPORT)]
     std = list()
 
     for i in range(NUMOFPORT):
-        expected_values[i] += (portfolios[i].loc['Portfolio']
+        expected_values[i] += (portfolios[i].loc['Weights']
                                * portfolios[i].loc['Expected Returns']).sum()
 
     for i in range(NUMOFPORT):
-        var[i] = np.dot(portfolios[i].loc['Portfolio'][0:4].to_numpy(), np.dot(
-            cov_mat, portfolios[i].loc['Portfolio'][0:4].to_numpy().transpose()))
+        var[i] = np.dot(portfolios[i].loc['Weights'][0:4].to_numpy(), np.dot(
+            cov_mat, portfolios[i].loc['Weights'][0:4].to_numpy().transpose()))
 
     std = [math.sqrt(var[i]) for i in range(NUMOFPORT)]
 
