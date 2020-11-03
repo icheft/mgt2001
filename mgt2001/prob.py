@@ -2,7 +2,7 @@ import numpy as np
 import math
 import pandas as pd
 import html
-from mgt2001 import *
+import mgt2001
 
 
 def BayesTHM(pre_probs, event='D'):
@@ -75,7 +75,7 @@ def portfolio_analysis(stock_df, target_stocks, pss):
     cov_mat = np.cov(stock_df[target_stocks].values, rowvar=False)
     stock_des = pd.DataFrame(
         data=cov_mat, columns=target_stocks, index=target_stocks)
-    stock_des.loc['Expected Returns'] = [geomean(stock_df.iloc[:, i]) for i in range(
+    stock_des.loc['Expected Returns'] = [mgt2001.geomean(stock_df.iloc[:, i]) for i in range(
         len(stock_df.columns))]  # stock_df.mean()
 
     portfolios = [stock_des.copy() for i in range(NUMOFPORT)]
