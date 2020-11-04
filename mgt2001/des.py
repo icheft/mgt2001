@@ -3,15 +3,38 @@ import math as math
 import mgt2001.per as per
 
 
-def outlier(data, base=per):
+def quartiles(data, base=per, show=False):
+    """
+    default show = False
+    """
+    Q1 = base.percentile(data, 25)
+    Q2 = base.percentile(data, 50)
+    Q3 = base.percentile(data, 75)
+    IQR = Q3 - Q1  # IQR is interquartile range.
+    description = """
+Q1 = {}
+Q2 = {}
+Q3 = {}
+IQR = {}
+    """.format(Q1, Q2, Q3, IQR)
+    if show:
+        print(description)
+
+    return Q1, Q2, Q3, IQR
+
+
+def outlier(data, base=per, show=True):
     """
     The default is set to per.percentile()
+    default show = True
 
     Usages
     ------
     >>> df = whatever DataFrame you construct
-    >>> per.outlier(df["column_name"], per) # to use per.percentile (textbook) to compute quartiles
-    >>> per.outlier(df["column_name"], np) # to use np.percentile to compute quartiles
+    # to use per.percentile (textbook) to compute quartiles
+    >>> per.outlier(df["column_name"], per)
+    # to use np.percentile to compute quartiles
+    >>> per.outlier(df["column_name"], np)
 
     Examples
     ------
@@ -39,10 +62,11 @@ def outlier(data, base=per):
     [359.0]
 
     """
-    Q1 = base.percentile(data, 25)
-    Q2 = base.percentile(data, 50)
-    Q3 = base.percentile(data, 75)
-    IQR = Q3 - Q1  # IQR is interquartile range.
+    # Q1 = base.percentile(data, 25)
+    # Q2 = base.percentile(data, 50)
+    # Q3 = base.percentile(data, 75)
+    # IQR = Q3 - Q1  # IQR is interquartile range.
+    Q1, Q2, Q3, IQR = quartiles(data, base=base)
     filter = (data < Q1 - 1.5 * IQR) | (data > Q3 + 1.5 * IQR)
     if (len(data.loc[filter].to_list()) != 0):
         outlier_prompt = "Outliers are listed as follows:\n{}".format(
@@ -58,8 +82,13 @@ IQR = {}
 
 {}
     """.format(Q1, Q2, Q3, IQR, outlier_prompt)
+    if show:
+        print(description)
 
-    return description
+    if (len(data.loc[filter].to_list()) != 0):
+        return data.loc[filter].to_list()
+    else:
+        return list()
 
 
 def kurtosis(df):

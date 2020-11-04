@@ -18,8 +18,14 @@ def kurtosis():
 def skewness():
     """
     Please refer to measure_of_movement.__doc__ for ms
-    ---
+    ------------
     G = m3 / sqrt(m2 ^ 3)
+    ---
+    A measure of a data set's deviation from symmetry:
+    + G > 0: Skewed to right
+    + G = 0: Symmetric
+    + G < 0: Skewed to left
+
     """
 
 
