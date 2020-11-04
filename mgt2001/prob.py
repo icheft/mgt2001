@@ -74,7 +74,7 @@ def portfolio_analysis(stock_df, target_stocks, pss):
     NUMOFSTOCKS = len(target_stocks)
     NUMOFPORT = len(pss)
 
-    cov_mat = np.cov(stock_df[target_stocks].values, rowvar=False)
+    cov_mat = np.cov(stock_df[target_stocks].values, rowvar=False, ddof=0)
     stock_des = pd.DataFrame(
         data=cov_mat, columns=target_stocks, index=target_stocks)
 
