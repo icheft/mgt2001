@@ -77,8 +77,9 @@ def portfolio_analysis(stock_df, target_stocks, pss):
     cov_mat = np.cov(stock_df[target_stocks].values, rowvar=False)
     stock_des = pd.DataFrame(
         data=cov_mat, columns=target_stocks, index=target_stocks)
-    stock_des.loc['Expected Returns'] = [mgt2001.geomean(stock_df.iloc[:, i]) for i in range(
-        len(stock_df.columns))]  # stock_df.mean()
+
+    stock_des.loc['Expected Returns'] = stock_df.mean()
+    # stock_df.mean() # [mgt2001.geomean(stock_df.iloc[:, i]) for i in range(len(stock_df.columns))]
 
     portfolios = [stock_des.copy() for i in range(NUMOFPORT)]
     for i in range(NUMOFPORT):
