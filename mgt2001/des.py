@@ -6,6 +6,8 @@ import mgt2001.per as per
 def quartiles(data, base=per, show=False):
     """
     default show = False
+
+    Return Q1, Q2, Q3, IQR
     """
     Q1 = base.percentile(data, 25)
     Q2 = base.percentile(data, 50)

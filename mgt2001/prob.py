@@ -51,7 +51,7 @@ The Bayes probability given the post event {i}:
         print(to_print)
 
 
-def portfolio_analysis(stock_df, target_stocks, pss):
+def portfolio_analysis(stock_df, target_stocks, pss, ddof=0):
     """
     Return list of portfolios
 
@@ -74,7 +74,7 @@ def portfolio_analysis(stock_df, target_stocks, pss):
     NUMOFSTOCKS = len(target_stocks)
     NUMOFPORT = len(pss)
 
-    cov_mat = np.cov(stock_df[target_stocks].values, rowvar=False, ddof=0)
+    cov_mat = np.cov(stock_df[target_stocks].values, rowvar=False, ddof=ddof)
     stock_des = pd.DataFrame(
         data=cov_mat, columns=target_stocks, index=target_stocks)
 

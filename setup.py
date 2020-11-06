@@ -11,8 +11,8 @@ def get_version(path):
     return version
 
 
-installations = ['numpy', 'pandas', 'matplotlib', 'adjustText',
-                 'scipy', 'ete3', 'seaborn', 'stemgraphic', 'statsmodels', 'plotly']
+installations = ['numpy', 'pandas', 'matplotlib', 'adjustText', 'scipy', 'ete3',
+                 'seaborn', 'stemgraphic', 'statsmodels', 'plotly', 'pymdown-extensions', 'mkdocs', 'mkdocs-material']
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
