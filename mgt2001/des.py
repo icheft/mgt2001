@@ -3,6 +3,20 @@ import math as math
 import mgt2001.per as per
 
 
+def interval(df):
+    upl_1 = round(df.mean() + df.std(), 4)
+    upl_2 = round(df.mean() + 2 * df.std(), 4)
+    upl_3 = round(df.mean() + 3 * df.std(), 4)
+    lowl_1 = round(df.mean() - df.std(), 4)
+    lowl_2 = round(df.mean() - 2 * df.std(), 4)
+    lowl_3 = round(df.mean() - 3 * df.std(), 4)
+    result = f"""1 std limits = ({lowl_1}, {upl_1})
+2 std limits = ({lowl_2}, {upl_2})
+3 std limits = ({lowl_3}, {upl_3})
+    """
+    print(result)
+
+
 def quartiles(data, base=per, show=False):
     """
     default show = False
@@ -29,6 +43,8 @@ def outlier(data, base=per, show=True):
     """
     The default is set to per.percentile()
     default show = True
+
+    Return a list of outliers and description
 
     Usages
     ------
@@ -88,9 +104,9 @@ IQR = {}
         print(description)
 
     if (len(data.loc[filter].to_list()) != 0):
-        return data.loc[filter].to_list()
+        return data.loc[filter].to_list(), description
     else:
-        return list()
+        return list(), description
 
 
 def kurtosis(df):
