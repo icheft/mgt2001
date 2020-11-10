@@ -109,3 +109,19 @@ Standard Deviation:{tab}{std:.7f}
         """.format(tab='\t', i=i+1, exp=expected_values[i], var=var[i], std=std[i])
         print(result)
     return portfolios
+
+
+def covariance(x, mu_x, y, mu_y, prob):
+    '''
+    Usage: `covariance(ibm_x, ibm.expect(), ms_y, ms.expect(), prob)`
+    Where `prob` equals 
+        → x
+        ↓ y
+
+    Prob can be a two dimensional array or a `numpy` array.
+    '''
+    cov = 0
+    for i, valy in enumerate(y):
+        for j, valx in enumerate(x):
+            cov += prob[i][j] * (valx - mu_x) * (valy - mu_y)
+    return cov

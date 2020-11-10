@@ -101,6 +101,7 @@ def README():
     ## `des.py`
     des == describe or description
 
+    + `interval(df)`: given a dataframe or an array, return the interval for the data. Mainly for Empirical Rules and Chebyshev.
     + `outlier(data, base=per)`: given a df col as the data; base is the function is should use. 
         For numpy, please enter `np`. Put in nothing for the `per` using the per.percentile() as defined in the textbook.
     + `kurtosis(df)`: return the kurtosis of the df col
@@ -141,6 +142,17 @@ def README():
         >> notes for np.cov and np.corrcoef
         cov_mat = np.cov(stock_df[target_stocks].values, rowvar=False) # [i, i] = variance of each stock
         cor_mat = np.corrcoef(df[target_stocks].values, rowvar = False)
+    + `covariance(x, mu_x, y, mu_y, prob)`: 
+        Usage: `covariance(ibm_x, ibm.expect(), ms_y, ms.expect(), prob)`
+
+        Where `prob` equals:
+
+        !!! notes
+            → x  
+            ↓ y
+
+        Prob can be a two dimensional array or a `numpy` array.
+
 
     ----------------
 
