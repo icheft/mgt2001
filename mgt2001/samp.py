@@ -1,6 +1,7 @@
 # samp for sampling
 import pandas as pd
 import math
+import scipy.stats as stats
 
 
 def to_xbar_freq(possible_outcome, repeat=1):
@@ -42,3 +43,22 @@ def returnStd(std1, std2, n1, n2):
 
 def returnVar(std1, std2, n1, n2):
     return math.pow(returnStd(std1, std2, n1, n2), 2)
+
+
+# Estimation
+
+
+def con_level(x_bar, sigma, n, sig_level):
+    a = sig_level
+    con_coef = 1 - a
+    z_value = stats.norm.ppf(1 - a / 2)
+    sig_x_bar = sigma / math.sqrt(n)
+    lcl = x_bar - z_value * sig_x_bar
+    ucl = x_bar + z_value * sig_x_bar
+    result = f"""Confidence Interval of {con_coef:.4f}% Confidence: {lcl:.4f} to {ucl:.4f}
+Mean: {x_bar:.4f}
+Z-Value: {z_value:.4f}
+Sigma of X-Bar: {sig_x_bar:.4f}
+    """
+    print(result)
+    return {"lcl": lcl, "ucl": ucl, "x_bar": x_bar, "z_value": z_value, "sig_x_bar": sig_x_bar}
