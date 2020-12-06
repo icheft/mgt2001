@@ -48,7 +48,7 @@ def returnVar(std1, std2, n1, n2):
 # Estimation
 
 
-def con_level(x_bar, sigma, n, sig_level):
+def con_level(x_bar, sigma, n, sig_level, toprint=True):
     a = sig_level
     con_coef = 1 - a
     z_value = stats.norm.ppf(1 - a / 2)
@@ -60,5 +60,18 @@ Mean: {x_bar:.4f}
 Z-Value: {z_value:.4f}
 Sigma of X-Bar: {sig_x_bar:.4f}
     """
-    print(result)
+    if toprint:
+        print(result)
     return {"lcl": lcl, "ucl": ucl, "x_bar": x_bar, "z_value": z_value, "sig_x_bar": sig_x_bar}
+
+
+def bound(a, std, n):
+    z_value = stats.norm.ppf(1 - a / 2)
+    return z_value * std / math.sqrt(n)
+
+
+def estimate_samp_size(bound, sig_level, sigma):
+    a = sig_level
+    z_value = stats.norm.ppf(1 - a / 2)
+    n = math.pow(z_value * sigma / bound, 2)
+    return n
