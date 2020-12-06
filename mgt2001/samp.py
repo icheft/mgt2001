@@ -55,7 +55,7 @@ def con_level(x_bar, sigma, n, sig_level):
     sig_x_bar = sigma / math.sqrt(n)
     lcl = x_bar - z_value * sig_x_bar
     ucl = x_bar + z_value * sig_x_bar
-    result = f"""Confidence Interval of {con_coef:.4f}% Confidence: {lcl:.4f} to {ucl:.4f}
+    result = f"""Confidence Interval of {con_coef * 100:.1f}% Confidence: {lcl:.4f} to {ucl:.4f}
 Mean: {x_bar:.4f}
 Z-Value: {z_value:.4f}
 Sigma of X-Bar: {sig_x_bar:.4f}
