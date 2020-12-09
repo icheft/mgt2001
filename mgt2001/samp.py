@@ -2,6 +2,8 @@
 import pandas as pd
 import math
 import scipy.stats as stats
+import itertools
+import random
 
 
 def to_xbar_freq(possible_outcome, repeat=1):
@@ -57,6 +59,7 @@ def con_level(x_bar, sigma, n, sig_level, toprint=True):
     ucl = x_bar + z_value * sig_x_bar
     result = f"""{con_coef * 100:.1f}% Confidence Interval: [{lcl:.4f}, {ucl:.4f}]
 Mean: {x_bar:.4f}
+Sample Size: {n}
 Z-Value: {z_value:.4f}
 Sigma of X-Bar: {sig_x_bar:.4f}
     """

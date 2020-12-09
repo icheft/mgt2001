@@ -11,7 +11,8 @@ import mgt2001.des as des
 import mgt2001.notes as notes
 import mgt2001.tree as tree
 import mgt2001.prob as prob
-import mgt2001.samp as samp
+import mgt2001.samp as samp  # sampling
+import mgt2001.hyp as hyp  # hypothesis
 
 from mgt2001._version import __version__
 
