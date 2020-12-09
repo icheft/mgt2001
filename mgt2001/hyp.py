@@ -35,11 +35,12 @@ Mean = {x_mean:.{precision}f}
 Number of Observation = {samp_num:.{precision}f}
 Hypothesized Mean (H0 Mean) = {h0_mean:.{precision}f}
 Assumed Standard Devation = {h0_std:.{precision}f}
-Significant Level = {siglevel:.{precision}f}
-Z = {z_value:.{precision}f}
+Significant Level (alpha) = {siglevel:.{precision}f}
+z (Observed value) = {z_value:.{precision}f}
 
 Using {option}:
-Z Critical Value = {zcv:.{precision}f}
+Difference = {x_mean - h0_mean}
+z (Critical value) = {zcv:.{precision}f}
 p-value = {p_value:.{precision}f} ({inter_p})"""
 
     print(result)
