@@ -61,7 +61,8 @@ P(Type II Error) = {type2_p:.{precision}f}
 Power of a Test = {ptest:.{precision}f}
 '''
 
-    print(result)
+    if show:
+        print(result)
 
     return type2_p, ptest
 
