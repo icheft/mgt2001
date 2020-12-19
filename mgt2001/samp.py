@@ -1,12 +1,14 @@
 # samp for sampling
 import pandas as pd
 import math
+import numpy as np
 import scipy.stats as stats
 import itertools
 import random
 
 
 def to_xbar_freq(possible_outcome, repeat=1):
+
     xbar_all = []
     for aelem in itertools.product(possible_outcome, repeat=repeat):
         xbar_all.append(np.mean(aelem))
