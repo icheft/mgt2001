@@ -17,8 +17,7 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6)):
     try:
         _ = iter(nsizes)
     except TypeError as te:
-        nsizes = list()
-        nsizes.append(nsizes)
+        nsizes = [nsizes]
 
     # right tail
     zcv = stats.norm.ppf(1-alpha)
