@@ -12,7 +12,7 @@ def sample_size(h0_mean, h1_mean, std, alpha, beta):
     return n
 
 
-def type2_plot(h0_mean, psigma, nsizes, alpha, ranges):
+def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6)):
     # show only right tail
     try:
         _ = iter(nsizes)
@@ -26,7 +26,7 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges):
     betas = np.zeros(means.shape[0])
     powers = betas.copy()
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=figsize)
 
     for nsize in nsizes:
         means = np.arange(ranges[0], ranges[1], 0.1)
