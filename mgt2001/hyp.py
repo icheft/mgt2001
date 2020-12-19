@@ -12,7 +12,20 @@ def sample_size(h0_mean, h1_mean, std, alpha, beta):
     return n
 
 
-def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6)):
+def power_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6)):
+    means, betas, xticks, yticks = type2_plot(
+        h0_mean, psigma, nsizes, alpha, ranges, figsize, pf=True, label=True)
+    plt.clf()
+    plt.plot(means, 1 - betas)
+    plt.xticks(xticks, rotation=45, fontsize=8)
+    plt.yticks(yticks, fontsize=8)
+    plt.title('Power Function Curve')
+    plt.margins(x=.01, tight=False)
+
+
+def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6), pf=False, label=True):
+    # 外面要自己 plt.show()
+
     # show only right tail
     try:
         _ = iter(nsizes)
@@ -39,7 +52,11 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6)):
             betas[i] = type2_p
             powers[i] = 1 - type2_p
             i += 1
-        plt.plot(means, betas, label=f'n = {nsize}')
+        if pf:
+            plt.plot(means, betas, label=f'OC')
+            plt.plot(means, powers, label=f'PF')
+        else:
+            plt.plot(means, betas, label=f'n = {nsize}')
 
     if len(ranges) == 3:
         xticks = np.arange(ranges[0], ranges[1] + 1, ranges[2])
@@ -52,8 +69,11 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6)):
     plt.yticks(yticks, fontsize=8)
     plt.ylabel("Probability of a Type II Error")
     plt.margins(x=.01, tight=False)
-    plt.legend()
-    plt.show()
+    if label:
+        plt.legend()
+
+    if pf:
+        return means, betas, xticks, yticks
 
 
 def power_test(x_mean, h0_mean, std, n, alpha, h1_mean, option='left', precision=4, show=True, ignore=True):
