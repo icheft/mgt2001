@@ -4,6 +4,55 @@ import math
 import scipy.stats as stats
 
 
+def sample_size(h0_mean, h1_mean, std, alpha, beta):
+    z_a = stats.norm.ppf(1 - alpha)
+    z_b = stats.norm.ppf(1 - beta)
+    n = (((z_a + z_b) * (std))**2) / ((h0_mean - h1_mean) ** 2)
+    return n
+
+
+def type2_plot(h0_mean, psigma, nsizes, alpha, ranges):
+    # show only right tail
+    try:
+        _ = iter(nsizes)
+    except TypeError as te:
+        nsizes = list()
+        nsizes.append(nsizes)
+
+    # right tail
+    zcv = stats.norm.ppf(1-alpha)
+    means = np.arange(ranges[0], ranges[1], 0.1)
+    betas = np.zeros(means.shape[0])
+    powers = betas.copy()
+
+    fig, ax = plt.subplots()
+
+    for nsize in nsizes:
+        means = np.arange(ranges[0], ranges[1], 0.1)
+        betas = np.zeros(means.shape[0])
+        powers = betas.copy()
+        i = 0
+        for h1_mean in means:
+            x_c = h0_mean + zcv * psigma / (nsize ** 0.5)
+            z_type2 = (x_c - h1_mean) / (psigma / (nsize ** 0.5))
+            type2_p = stats.norm.cdf(z_type2)
+            betas[i] = type2_p
+            powers[i] = 1 - type2_p
+            i += 1
+        plt.plot(means, betas, label=f'n = {nsize}')
+
+    xticks = np.arange(ranges[0], ranges[1] + 1, 1)
+    yticks = np.arange(0, 1.1, .1)
+
+    plt.xlabel("H1 Mean")
+    plt.xticks(xticks, rotation=45, fontsize=8)
+    plt.yticks(yticks, fontsize=8)
+    plt.ylabel("Probability of a Type II Error")
+    plt.margins(x=.01, tight=False)
+    plt.legend()
+    plt.show()
+
+
 def power_test(x_mean, h0_mean, std, n, alpha, h1_mean, option='left', precision=4, show=True, ignore=True):
     opt = option.lower()[0]
     if opt == 't':
