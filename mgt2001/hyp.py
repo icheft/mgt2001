@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 import math
@@ -25,7 +26,7 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges):
     betas = np.zeros(means.shape[0])
     powers = betas.copy()
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(12, 6))
 
     for nsize in nsizes:
         means = np.arange(ranges[0], ranges[1], 0.1)
@@ -41,7 +42,10 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges):
             i += 1
         plt.plot(means, betas, label=f'n = {nsize}')
 
-    xticks = np.arange(ranges[0], ranges[1] + 1, 1)
+    if len(ranges) == 3:
+        xticks = np.arange(ranges[0], ranges[1] + 1, ranges[2])
+    else:  # default
+        xticks = np.arange(ranges[0], ranges[1] + 1, 1)
     yticks = np.arange(0, 1.1, .1)
 
     plt.xlabel("H1 Mean")
