@@ -8,7 +8,9 @@ import random
 
 
 def to_xbar_freq(possible_outcome, repeat=1):
-
+    """
+    Return a `DataFrame` that stores `x` values and its `prob` (probability).
+    """
     xbar_all = []
     for aelem in itertools.product(possible_outcome, repeat=repeat):
         xbar_all.append(np.mean(aelem))
@@ -34,6 +36,9 @@ def returnZ(x, mu, std):
 
 
 def check5(n, p):
+    """
+    Return a bool. Check if a set of measurements can apply normal approximation.
+    """
     return n * p > 5 and n * (1 - p) > 5
 
 
@@ -52,8 +57,13 @@ def returnVar(std1, std2, n1, n2):
 # Estimation
 
 
-def con_level(x_bar, sigma, n, sig_level, toprint=True):
-    a = sig_level
+def con_level(x_bar, sigma, n, alpha, show=True):
+    """
+Return the confidence level at $\alpha$. Return a dictionary: {"lcl": lcl, "ucl": ucl, "x_bar": x_bar, "z_value": z_value, "sig_x_bar": sig_x_bar}
+
++ `show`: default is `True`. Set to `False` to disable rendering.
+    """
+    a = alpha
     con_coef = 1 - a
     z_value = stats.norm.ppf(1 - a / 2)
     sig_x_bar = sigma / math.sqrt(n)
@@ -65,7 +75,7 @@ Sample Size: {n}
 Z-Value: {z_value:.4f}
 Sigma of X-Bar: {sig_x_bar:.4f}
     """
-    if toprint:
+    if show:
         print(result)
     return {"lcl": lcl, "ucl": ucl, "x_bar": x_bar, "z_value": z_value, "sig_x_bar": sig_x_bar}
 

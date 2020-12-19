@@ -5,140 +5,6 @@ import math
 import scipy.stats as stats
 
 
-def sample_size(h0_mean, h1_mean, std, alpha, beta):
-    z_a = stats.norm.ppf(1 - alpha)
-    z_b = stats.norm.ppf(1 - beta)
-    n = (((z_a + z_b) * (std))**2) / ((h0_mean - h1_mean) ** 2)
-    return n
-
-
-def power_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6)):
-    means, betas, xticks, yticks = type2_plot(
-        h0_mean, psigma, nsizes, alpha, ranges, figsize, pf=True, label=True)
-    plt.clf()
-    plt.plot(means, 1 - betas)
-    plt.xticks(xticks, rotation=45, fontsize=8)
-    plt.yticks(yticks, fontsize=8)
-    plt.title('Power Function Curve')
-    plt.margins(x=.01, tight=False)
-
-
-def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6), pf=False, label=True):
-    # 外面要自己 plt.show()
-
-    # show only right tail
-    try:
-        _ = iter(nsizes)
-    except TypeError as te:
-        nsizes = [nsizes]
-
-    # right tail
-    zcv = stats.norm.ppf(1-alpha)
-    means = np.arange(ranges[0], ranges[1], 0.1)
-    betas = np.zeros(means.shape[0])
-    powers = betas.copy()
-
-    fig, ax = plt.subplots(figsize=figsize)
-
-    for nsize in nsizes:
-        means = np.arange(ranges[0], ranges[1], 0.1)
-        betas = np.zeros(means.shape[0])
-        powers = betas.copy()
-        i = 0
-        for h1_mean in means:
-            x_c = h0_mean + zcv * psigma / (nsize ** 0.5)
-            z_type2 = (x_c - h1_mean) / (psigma / (nsize ** 0.5))
-            type2_p = stats.norm.cdf(z_type2)
-            betas[i] = type2_p
-            powers[i] = 1 - type2_p
-            i += 1
-        if pf:
-            plt.plot(means, betas, label=f'OC')
-            plt.plot(means, powers, label=f'PF')
-        else:
-            plt.plot(means, betas, label=f'n = {nsize}')
-
-    if len(ranges) == 3:
-        xticks = np.arange(ranges[0], ranges[1] + 1, ranges[2])
-    else:  # default
-        xticks = np.arange(ranges[0], ranges[1] + 1, 1)
-    yticks = np.arange(0, 1.1, .1)
-
-    plt.xlabel("H1 Mean")
-    plt.xticks(xticks, rotation=45, fontsize=8)
-    plt.yticks(yticks, fontsize=8)
-    plt.ylabel("Probability of a Type II Error")
-    plt.margins(x=.01, tight=False)
-    if label:
-        plt.legend()
-
-    if pf:
-        return means, betas, xticks, yticks
-
-
-def power_test(x_mean, h0_mean, std, n, alpha, h1_mean, option='left', precision=4, show=True, ignore=True):
-    opt = option.lower()[0]
-    if opt == 't':
-        option = 'Two-Tail Test'
-        x_l, x_u = rejection_region_method(
-            x_mean, h0_mean, std, n, alpha, option=opt, precision=precision, show=show, ignore=ignore)
-        z_value = stats.norm.ppf(1 - alpha / 2)
-        z_l = -z_value
-        z_u = z_value
-        z_type2_l = (x_l - h1_mean) / (std / (n ** 0.5))
-        z_type2_u = (x_u - h1_mean) / (std / (n ** 0.5))
-        type2_p_l = stats.norm.cdf(z_type2_l)
-        type2_p_u = stats.norm.cdf(z_type2_u)
-        type2_p = type2_p_u - type2_p_l
-        ptest = 1 - type2_p
-        result = f'''======= Evaluating Type II Errors ({option}) =======
-μ = {h1_mean}
-z (lower bound) = {z_type2_l:.{precision}f}
-z (upper bound) = {z_type2_u:.{precision}f}
-
-z_l (Lower bound for the critical value) = {z_l:.{precision}f}
-z_u (Upper bound for the critical value) = {z_u:.{precision}f}
-
-x_l (Lower bound for x critical value) = {x_l:.{precision}f}
-x_u (Upper bound for x critical value) = {x_u:.{precision}f}
-
-P(Type II Error) = {type2_p:.{precision}f}
-Power of a Test = {ptest:.{precision}f}
-        '''
-    else:
-        x_c = rejection_region_method(
-            x_mean, h0_mean, std, n, alpha, option=opt, precision=precision, show=show, ignore=ignore)
-        if opt == 'l':
-            option = 'One-Tail Test (left tail)'
-            z_c = -stats.norm.ppf(1 - alpha)
-            z_type2 = (x_c - h1_mean) / (std / (n ** 0.5))
-            type2_p = 1 - stats.norm.cdf(z_type2)
-            ptest = 1 - type2_p
-
-        elif opt == 'r':
-            option = 'One-Tail Test (right tail)'
-            z_c = stats.norm.ppf(1 - alpha)
-            z_type2 = (x_c - h1_mean) / (std / (n ** 0.5))
-            type2_p = stats.norm.cdf(z_type2)
-            ptest = 1 - type2_p
-
-        result = f'''======= Evaluating Type II Errors ({option}) =======
-μ = {h1_mean}
-z = {z_type2:.{precision}f}
-
-z critical value = {z_c:.{precision}f}
-x critical value = {x_c:.{precision}f}
-
-P(Type II Error) = {type2_p:.{precision}f}
-Power of a Test = {ptest:.{precision}f}
-'''
-
-    if show:
-        print(result)
-
-    return type2_p, ptest
-
-
 def rejection_region_method(x_mean, mu, std, n, alpha, option='left', precision=4, show=True, ignore=False):
     opt = option.lower()[0]
     if opt == 't':
@@ -337,3 +203,137 @@ Significant Level (alpha) = {siglevel:.{precision}f}
     print(result)
 
     return zcv, p_value
+
+
+def power_test(x_mean, h0_mean, std, n, alpha, h1_mean, option='left', precision=4, show=True, ignore=True):
+    opt = option.lower()[0]
+    if opt == 't':
+        option = 'Two-Tail Test'
+        x_l, x_u = rejection_region_method(
+            x_mean, h0_mean, std, n, alpha, option=opt, precision=precision, show=show, ignore=ignore)
+        z_value = stats.norm.ppf(1 - alpha / 2)
+        z_l = -z_value
+        z_u = z_value
+        z_type2_l = (x_l - h1_mean) / (std / (n ** 0.5))
+        z_type2_u = (x_u - h1_mean) / (std / (n ** 0.5))
+        type2_p_l = stats.norm.cdf(z_type2_l)
+        type2_p_u = stats.norm.cdf(z_type2_u)
+        type2_p = type2_p_u - type2_p_l
+        ptest = 1 - type2_p
+        result = f'''======= Evaluating Type II Errors ({option}) =======
+μ = {h1_mean}
+z (lower bound) = {z_type2_l:.{precision}f}
+z (upper bound) = {z_type2_u:.{precision}f}
+
+z_l (Lower bound for the critical value) = {z_l:.{precision}f}
+z_u (Upper bound for the critical value) = {z_u:.{precision}f}
+
+x_l (Lower bound for x critical value) = {x_l:.{precision}f}
+x_u (Upper bound for x critical value) = {x_u:.{precision}f}
+
+P(Type II Error) = {type2_p:.{precision}f}
+Power of a Test = {ptest:.{precision}f}
+        '''
+    else:
+        x_c = rejection_region_method(
+            x_mean, h0_mean, std, n, alpha, option=opt, precision=precision, show=show, ignore=ignore)
+        if opt == 'l':
+            option = 'One-Tail Test (left tail)'
+            z_c = -stats.norm.ppf(1 - alpha)
+            z_type2 = (x_c - h1_mean) / (std / (n ** 0.5))
+            type2_p = 1 - stats.norm.cdf(z_type2)
+            ptest = 1 - type2_p
+
+        elif opt == 'r':
+            option = 'One-Tail Test (right tail)'
+            z_c = stats.norm.ppf(1 - alpha)
+            z_type2 = (x_c - h1_mean) / (std / (n ** 0.5))
+            type2_p = stats.norm.cdf(z_type2)
+            ptest = 1 - type2_p
+
+        result = f'''======= Evaluating Type II Errors ({option}) =======
+μ = {h1_mean}
+z = {z_type2:.{precision}f}
+
+z critical value = {z_c:.{precision}f}
+x critical value = {x_c:.{precision}f}
+
+P(Type II Error) = {type2_p:.{precision}f}
+Power of a Test = {ptest:.{precision}f}
+'''
+
+    if show:
+        print(result)
+
+    return type2_p, ptest
+
+
+def sample_size(h0_mean, h1_mean, std, alpha, beta):
+    z_a = stats.norm.ppf(1 - alpha)
+    z_b = stats.norm.ppf(1 - beta)
+    n = (((z_a + z_b) * (std))**2) / ((h0_mean - h1_mean) ** 2)
+    return n
+
+
+def power_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6)):
+    means, betas, xticks, yticks = type2_plot(
+        h0_mean, psigma, nsizes, alpha, ranges, figsize, pf=True, label=True)
+    plt.clf()
+    plt.plot(means, 1 - betas)
+    plt.xticks(xticks, rotation=45, fontsize=8)
+    plt.yticks(yticks, fontsize=8)
+    plt.title('Power Function Curve')
+    plt.margins(x=.01, tight=False)
+
+
+def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6), pf=False, label=True):
+    # 外面要自己 plt.show()
+
+    # show only right tail
+    try:
+        _ = iter(nsizes)
+    except TypeError as te:
+        nsizes = [nsizes]
+
+    # right tail
+    zcv = stats.norm.ppf(1-alpha)
+    means = np.arange(ranges[0], ranges[1], 0.1)
+    betas = np.zeros(means.shape[0])
+    powers = betas.copy()
+
+    fig, ax = plt.subplots(figsize=figsize)
+
+    for nsize in nsizes:
+        means = np.arange(ranges[0], ranges[1], 0.1)
+        betas = np.zeros(means.shape[0])
+        powers = betas.copy()
+        i = 0
+        for h1_mean in means:
+            x_c = h0_mean + zcv * psigma / (nsize ** 0.5)
+            z_type2 = (x_c - h1_mean) / (psigma / (nsize ** 0.5))
+            type2_p = stats.norm.cdf(z_type2)
+            betas[i] = type2_p
+            powers[i] = 1 - type2_p
+            i += 1
+        if pf:
+            plt.plot(means, betas, label=f'OC')
+            plt.plot(means, powers, label=f'PF')
+        else:
+            plt.plot(means, betas, label=f'n = {nsize}')
+
+    if len(ranges) == 3:
+        xticks = np.arange(ranges[0], ranges[1] + 1, ranges[2])
+    else:  # default
+        xticks = np.arange(ranges[0], ranges[1] + 1, 1)
+    yticks = np.arange(0, 1.1, .1)
+
+    plt.xlabel("H1 Mean")
+    plt.xticks(xticks, rotation=45, fontsize=8)
+    plt.yticks(yticks, fontsize=8)
+    plt.ylabel("Probability of a Type II Error")
+    plt.margins(x=.01, tight=False)
+    if label:
+        plt.legend()
+
+    if pf:
+        return means, betas, xticks, yticks
