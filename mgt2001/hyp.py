@@ -275,9 +275,9 @@ def sample_size(h0_mean, h1_mean, std, alpha, beta):
     return n
 
 
-def power_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6)):
+def power_plot(h0_mean, psigma, nsizes, alpha, ranges, option='r', figsize=(12, 6)):
     means, betas, xticks, yticks = type2_plot(
-        h0_mean, psigma, nsizes, alpha, ranges, figsize, pf=True, label=True)
+        h0_mean, psigma, nsizes, alpha, ranges, option=option, figsize=figsize, pf=True, label=True)
     plt.clf()
     plt.plot(means, 1 - betas)
     plt.xticks(xticks, rotation=45, fontsize=8)
@@ -286,7 +286,7 @@ def power_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6)):
     plt.margins(x=.01, tight=False)
 
 
-def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6), pf=False, label=True):
+def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(12, 6), pf=False, label=True):
     # 外面要自己 plt.show()
 
     # show only right tail
@@ -295,8 +295,15 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6), pf=False
     except TypeError as te:
         nsizes = [nsizes]
 
+    opt = option.lower()[0]
     # right tail
-    zcv = stats.norm.ppf(1-alpha)
+    if opt == 'r':
+        zcv = stats.norm.ppf(1-alpha)
+    elif opt == 'l':
+        zcv = -stats.norm.ppf(1-alpha)
+    elif opt == 't':
+        zcv = stats.norm.ppf(1 - alpha / 2)
+
     means = np.arange(ranges[0], ranges[1], 0.1)
     betas = np.zeros(means.shape[0])
     powers = betas.copy()
@@ -308,13 +315,36 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, figsize=(12, 6), pf=False
         betas = np.zeros(means.shape[0])
         powers = betas.copy()
         i = 0
-        for h1_mean in means:
+        if opt == 'r':
             x_c = h0_mean + zcv * psigma / (nsize ** 0.5)
-            z_type2 = (x_c - h1_mean) / (psigma / (nsize ** 0.5))
-            type2_p = stats.norm.cdf(z_type2)
-            betas[i] = type2_p
-            powers[i] = 1 - type2_p
-            i += 1
+            for h1_mean in means:
+                z_type2 = (x_c - h1_mean) / (psigma / (nsize ** 0.5))
+                type2_p = stats.norm.cdf(z_type2)
+                betas[i] = type2_p
+                powers[i] = 1 - type2_p
+                i += 1
+        elif opt == 'l':
+            x_c = h0_mean + zcv * psigma / (nsize ** 0.5)
+            for h1_mean in means:
+                z_type2 = (x_c - h1_mean) / (psigma / (nsize ** 0.5))
+                type2_p = 1 - stats.norm.cdf(z_type2)
+                betas[i] = type2_p
+                powers[i] = 1 - type2_p
+                i += 1
+        elif opt == 't':
+            x_u = h0_mean + zcv * psigma / math.sqrt(nsize)
+            x_l = h0_mean - zcv * psigma / math.sqrt(nsize)
+            # x_l, x_u = rejection_region_method(_, h0_mean, psigma, nsize, alpha, option=opt, precision=4, show=False, ignore=True)
+            for h1_mean in means:
+                z_type2_l = (x_l - h1_mean) / (psigma / (nsize ** 0.5))
+                z_type2_u = (x_u - h1_mean) / (psigma / (nsize ** 0.5))
+                type2_p_l = stats.norm.cdf(z_type2_l)
+                type2_p_u = stats.norm.cdf(z_type2_u)
+                type2_p = type2_p_u - type2_p_l
+                betas[i] = type2_p
+                powers[i] = 1 - type2_p
+                i += 1
+
         if pf:
             plt.plot(means, betas, label=f'OC')
             plt.plot(means, powers, label=f'PF')
