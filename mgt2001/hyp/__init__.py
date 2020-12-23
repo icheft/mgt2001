@@ -4,6 +4,8 @@ import numpy as np
 import math
 import scipy.stats as stats
 
+from . import t
+
 
 def rejection_region_method(x_mean, mu, std, n, alpha, option='left', precision=4, show=True, ignore=False):
     opt = option.lower()[0]

@@ -6,16 +6,16 @@ import numpy as np
 import math as math
 from adjustText import adjust_text
 
-import mgt2001.per as per
-import mgt2001.des as des
-import mgt2001.notes as notes
-import mgt2001.tree as tree
-import mgt2001.prob as prob
-import mgt2001.samp as samp  # sampling
-import mgt2001.hyp as hyp  # hypothesis
-import mgt2001.t as t  # hypothesis using t instead of z
+from . import per
+from . import des
+from . import notes
+from . import tree
+from . import prob
+from . import samp  # sampling
+from . import hyp  # hypothesis
+from . import t  # hypothesis using t instead of z
 
-from mgt2001._version import __version__
+from ._version import __version__
 
 
 def geomean(rate):
