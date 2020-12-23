@@ -13,7 +13,7 @@ import mgt2001.tree as tree
 import mgt2001.prob as prob
 import mgt2001.samp as samp  # sampling
 import mgt2001.hyp as hyp  # hypothesis
-import mgt2001.t_hyp as t_hyp  # hypothesis using t instead of z
+import mgt2001.t as t  # hypothesis using t instead of z
 
 from mgt2001._version import __version__
 
