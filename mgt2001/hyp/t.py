@@ -103,7 +103,7 @@ def testing_statistic_method(x_mean, mu, std, n, alpha, option='left', precision
         t_value = stats.t.ppf(1 - alpha / 2, df=df_v)
         t_u = t_value
         t_l = -t_value
-        flag = t <= t_l or t >= t_u
+        flag = t < t_l or t > t_u
 
         if not ignore:
             result = f'''======= Testing Statistic Method =======
@@ -131,11 +131,11 @@ t_u (Upper bound for the critical value) = {t_u:.{precision}f}
             # left tail
             option = 'One-Tail Test (left tail)'
             t_value = stats.t.ppf(alpha, df=df_v)  # negative
-            flag = t <= t_value
+            flag = t < t_value
         elif opt == 'r':
             option = 'One-Tail Test (right tail)'
             t_value = stats.t.ppf(1 - alpha, df=df_v)
-            flag = t >= t_value
+            flag = t > t_value
 
         if not ignore:
             result = f'''======= Testing Statistic Method =======
@@ -187,7 +187,7 @@ def p_value_method(x_mean, h0_mean, std, samp_num, siglevel, option='left', prec
         option = 'Two-Tail Test'
         p_value = (1 - stats.t.cdf(t_value, df=df_v)) * 2
         tcv = stats.t.ppf(1 - siglevel/2, df=df_v)
-        flag = p_value <= alpha
+        flag = p_value < alpha
         sub_result = f'''Using {option}:
 Difference = {x_mean - h0_mean}
 t (Critical value) = {-tcv:.{precision}f}, {tcv:.{precision}f}
@@ -204,7 +204,7 @@ Reject H_0 → {flag}
             option = 'One-Tail Test (right tail)'
             p_value = stats.t.sf(t_value, df=df_v)
             tcv = stats.t.ppf(1 - siglevel, df=df_v)
-        flag = p_value <= alpha
+        flag = p_value < alpha
         sub_result = f'''Using {option}:
 Difference = {x_mean - h0_mean}
 t (Critical value) = {tcv:.{precision}f}

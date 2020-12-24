@@ -85,7 +85,7 @@ def testing_statistic_method(x_mean, mu, std, n, alpha, option='left', precision
         z_value = stats.norm.ppf(1 - alpha / 2)
         z_u = z_value
         z_l = -z_value
-        flag = z <= z_l or z >= z_u
+        flag = z < z_l or z > z_u
 
         if not ignore:
             result = f'''======= Testing Statistic Method =======
@@ -113,11 +113,11 @@ z_u (Upper bound for the critical value) = {z_u:.{precision}f}
             # left tail
             option = 'One-Tail Test (left tail)'
             z_value = stats.norm.ppf(alpha)  # negative
-            flag = z <= z_value
+            flag = z < z_value
         elif opt == 'r':
             option = 'One-Tail Test (right tail)'
             z_value = stats.norm.ppf(1 - alpha)
-            flag = z >= z_value
+            flag = z > z_value
 
         if not ignore:
             result = f'''======= Testing Statistic Method =======
@@ -168,7 +168,7 @@ def p_value_method(x_mean, h0_mean, h0_std, samp_num, siglevel, option='left', p
         option = 'Two-Tail Test'
         p_value = (1 - stats.norm.cdf(z_value)) * 2
         zcv = stats.norm.ppf(1 - siglevel/2)
-        flag = p_value <= alpha
+        flag = p_value < alpha
         sub_result = f'''Using {option}:
 Difference = {x_mean - h0_mean}
 z (Critical value) = {-zcv:.{precision}f}, {zcv:.{precision}f}
@@ -185,7 +185,7 @@ Reject H_0 → {flag}
             option = 'One-Tail Test (right tail)'
             p_value = stats.norm.sf(z_value)
             zcv = stats.norm.ppf(1 - siglevel)
-        flag = p_value <= alpha
+        flag = p_value < alpha
         sub_result = f'''Using {option}:
 Difference = {x_mean - h0_mean}
 z (Critical value) = {zcv:.{precision}f}
@@ -297,14 +297,13 @@ def power_plot(h0_mean, psigma, nsizes, alpha, ranges, option='r', figsize=(12, 
 def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(12, 6), pf=False, label=True):
     # 外面要自己 plt.show()
 
-    # show only right tail
     try:
         _ = iter(nsizes)
     except TypeError as te:
         nsizes = [nsizes]
 
     opt = option.lower()[0]
-    # right tail
+    # options
     if opt == 'r':
         zcv = stats.norm.ppf(1-alpha)
     elif opt == 'l':

@@ -258,4 +258,4 @@ Significant Level (alpha) = {alpha:.{precision}f}
 
     print(result)
 
-    return p_value
+    return chi2_stat, p_value
