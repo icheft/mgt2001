@@ -6,10 +6,10 @@ import numpy as np
 import math as math
 from adjustText import adjust_text
 
+from . import tree
 from . import per
 from . import des
 from . import notes
-from . import tree
 from . import prob
 from . import samp  # sampling
 from . import hyp  # hypothesis
