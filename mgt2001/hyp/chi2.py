@@ -35,20 +35,6 @@ The interval {cover}
     return {"lcl": lcl, "ucl": ucl}
 
 
-alpha = 0.01
-nsize = 25
-df_v = nsize - 1
-std = 0.7958
-sigma = 1
-chi_obs = df_v * (std ** 2) / (sigma ** 2)
-var = std ** 2
-print(var)
-chi_cv = stats.chi2.ppf(alpha, df_v)
-print(chi_cv)
-s_cv = chi_cv * (sigma ** 2) / df_v
-s_cv
-
-
 def rejection_region_method(alpha, n, s, sigma, option='left', precision=4, show=True, ignore=False):
     opt = option.lower()[0]
     df_v = n - 1
