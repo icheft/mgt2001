@@ -73,13 +73,13 @@ S_U^2 (Upper bound for the critical value) = {s2_u:.{precision}f}
         if opt == 'l':
             # left tail
             option = 'One-Tail Test (left tail)'
-            chi2_value = df_v * (std ** 2) / (sigma ** 2)
+            chi2_value = df_v * (s ** 2) / (sigma ** 2)
             chi2_cv = stats.chi2.ppf(alpha, df_v)
             s2_c = chi2_cv * (sigma ** 2) / df_v
             flag = var < s2_c
         elif opt == 'r':
             option = 'One-Tail Test (right tail)'
-            chi2_value = df_v * (std ** 2) / (sigma ** 2)
+            chi2_value = df_v * (s ** 2) / (sigma ** 2)
             chi2_cv = stats.chi2.ppf(1 - alpha, df_v)
             s2_c = chi2_cv * (sigma ** 2) / df_v
             flag = var > s2_c
