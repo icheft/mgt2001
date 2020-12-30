@@ -240,10 +240,10 @@ Power of a Test = {ptest:.{precision}f}
     else:
         x_c = rejection_region_method(
             x_mean, h0_mean, std, n, alpha, option=opt, precision=precision, show=show, ignore=ignore)
-        if x_c > h1_mean:
-            opt = 'l'
-        else:
-            opt = 'r'
+        # if x_c > h1_mean:
+        #     opt = 'l'
+        # else:
+        #     opt = 'r'
 
         if opt == 'l':
             option = 'One-Tail Test (left tail)'
