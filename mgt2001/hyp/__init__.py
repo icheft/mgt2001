@@ -6,6 +6,7 @@ import scipy.stats as stats
 
 from . import t
 from . import chi2
+from . import p
 
 
 def rejection_region_method(x_mean, mu, std, n, alpha, option='left', precision=4, show=True, ignore=False):
