@@ -1,3 +1,5 @@
+.vscode/
+*ipynb
 
 # Created by https://www.toptal.com/developers/gitignore/api/python
 # Edit at https://www.toptal.com/developers/gitignore?templates=python
@@ -8,7 +10,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-*ipynb
 
 # C extensions
 *.so

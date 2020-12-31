@@ -20,6 +20,7 @@ def con_level(s_p, n, alpha, show=True, Wilson=False, N=False):
         lat = z_cv * math.sqrt(s_p * (1 - s_p)/(n + 4))
     else:
         lat = z_cv * math.sqrt(s_p * (1 - s_p)/n)
+
     lcl = s_p - lat
     ucl = s_p + lat
 
@@ -28,12 +29,20 @@ def con_level(s_p, n, alpha, show=True, Wilson=False, N=False):
             fpcf = math.sqrt((N - n)/(N - 1))
             lcl = s_p - lat * fpcf
             ucl = s_p + lat * fpcf
+        if lcl < 0:
+            lcl = 0
+        if ucl < 0:
+            ucl = 0
         result = f"""{con_coef * 100:.1f}% Confidence Interval: N [{lcl:.4f}, {ucl:.4f}] = [{N * lcl:.4f}, {N * ucl:.4f}]
 p̂: {s_p:.4f}
 Sample Size: {n}
 z_cv (Critical value): {z_cv:.4f}
     """
     else:
+        if lcl < 0:
+            lcl = 0
+        if ucl < 0:
+            ucl = 0
         result = f"""{con_coef * 100:.1f}% Confidence Interval: [{lcl:.4f}, {ucl:.4f}]
 p̂: {s_p:.4f}
 Sample Size: {n}
@@ -151,7 +160,8 @@ z_cv (Upper bound for the critical value) = {z_cv:.{precision}f}
         if opt == 'l':
             # left tail
             option = 'One-Tail Test (left tail)'
-            flag = z_stats < -z_cv
+            z_cv = -z_cv
+            flag = z_stats < z_cv
         elif opt == 'r':
             option = 'One-Tail Test (right tail)'
             flag = z_stats > z_cv
