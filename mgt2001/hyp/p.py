@@ -15,6 +15,8 @@ def samp_size(s_p, width, alpha):
 def con_level(s_p, n, alpha, show=True, Wilson=False, N=False):
     con_coef = 1 - alpha
     z_cv = stats.norm.ppf(1 - alpha / 2)
+    if not Wilson and not samp.check5(n, s_p):
+        print('Not satisfying np̂ > 5 and n(1 - p̂) > 5...')
     if Wilson:
         # make sure that you have arrange s_p to (x + 2) / (n + 4)
         lat = z_cv * math.sqrt(s_p * (1 - s_p)/(n + 4))
