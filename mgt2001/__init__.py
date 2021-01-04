@@ -6,7 +6,8 @@ import numpy as np
 import math as math
 from adjustText import adjust_text
 
-from . import tree
+# from . import tree
+from . import pj
 from . import per
 from . import des
 from . import notes
