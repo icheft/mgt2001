@@ -168,6 +168,8 @@ def p_value_method(x_mean, h0_mean, h0_std, samp_num, siglevel, option='left', p
         # two-tail test
         option = 'Two-Tail Test'
         p_value = (1 - stats.norm.cdf(z_value)) * 2
+        if (p_value > 1):
+            p_value = (stats.norm.cdf(z_value)) * 2
         zcv = stats.norm.ppf(1 - siglevel/2)
         flag = p_value < alpha
         sub_result = f'''Using {option}:
