@@ -309,7 +309,7 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(
         plt.legend()
 
     if pf:
-        return means, betas, xticks, yticks
+        return fig, ax, means, betas, xticks, yticks
 
 
 def power_test(x_mean, h0_mean, std, n, alpha, h1_mean, option='left', precision=4, show=True, ignore=True):
@@ -383,7 +383,7 @@ Power of a Test = {ptest:.{precision}f}
 
 
 def power_plot(h0_mean, psigma, nsizes, alpha, ranges, option='r', figsize=(12, 6)):
-    means, betas, xticks, yticks = type2_plot(
+    fig, ax, means, betas, xticks, yticks = type2_plot(
         h0_mean, psigma, nsizes, alpha, ranges, option=option, figsize=figsize, pf=True, label=True)
     plt.clf()
     plt.plot(means, 1 - betas)

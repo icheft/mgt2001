@@ -12,7 +12,7 @@ def samp_size(s_p, width, alpha):
     return (z_cv * math.sqrt(s_p * (1 - s_p)) / width) ** 2
 
 
-def con_level(s_p, n, alpha, show=True, Wilson=False, N=False):
+def con_level(s_p, n, alpha, show=True, Wilson=False, N=False, correction=True):
     """
     Caution: np̂ > 5 and n(1 - p̂) > 5
     """
@@ -30,7 +30,8 @@ def con_level(s_p, n, alpha, show=True, Wilson=False, N=False):
     ucl = s_p + lat
 
     if N:
-        if n / N > 0.5:
+        if n / N > 0.5 and correction:
+            print("Corrected...")
             fpcf = math.sqrt((N - n)/(N - 1))
             lcl = s_p - lat * fpcf
             ucl = s_p + lat * fpcf
@@ -44,10 +45,10 @@ Sample Size: {n}
 z_cv (Critical value): {z_cv:.4f}
     """
     else:
-        # if lcl < 0:
-        #     lcl = 0
-        # if ucl < 0:
-        #     ucl = 0
+        if lcl < 0:
+            lcl = 0
+        if ucl < 0:
+            ucl = 0
         result = f"""{con_coef * 100:.1f}% Confidence Interval: [{lcl:.4f}, {ucl:.4f}]
 p̂: {s_p:.4f}
 Sample Size: {n}

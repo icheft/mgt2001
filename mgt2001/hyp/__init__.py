@@ -287,7 +287,7 @@ def sample_size(h0_mean, h1_mean, std, alpha, beta):
 
 
 def power_plot(h0_mean, psigma, nsizes, alpha, ranges, option='r', figsize=(12, 6)):
-    means, betas, xticks, yticks = type2_plot(
+    fig, ax, means, betas, xticks, yticks = type2_plot(
         h0_mean, psigma, nsizes, alpha, ranges, option=option, figsize=figsize, pf=True, label=True)
     plt.clf()
     plt.plot(means, 1 - betas)
@@ -376,4 +376,4 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(
         plt.legend()
 
     if pf:
-        return means, betas, xticks, yticks
+        return fig, ax, means, betas, xticks, yticks
