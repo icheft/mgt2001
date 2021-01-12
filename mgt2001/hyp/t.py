@@ -229,7 +229,7 @@ Significant Level (alpha) = {siglevel:.{precision}f}
     return tcv, p_value
 
 
-def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(12, 6), pf=False, label=True):
+def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(12, 6), pf=False, label=True, show=True):
     # 外面要自己 plt.show()
 
     try:
@@ -243,8 +243,8 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(
     means = np.arange(ranges[0], ranges[1], 0.1)
     betas = np.zeros(means.shape[0])
     powers = betas.copy()
-
-    fig, ax = plt.subplots(figsize=figsize)
+    if show:
+        fig, ax = plt.subplots(figsize=figsize)
 
     for nsize in nsizes:
         df_v = nsize - 1
@@ -288,11 +288,12 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(
                 powers[i] = 1 - type2_p
                 i += 1
 
-        if pf:
-            plt.plot(means, betas, label=f'OC')
-            plt.plot(means, powers, label=f'PF')
-        else:
-            plt.plot(means, betas, label=f'n = {nsize}')
+        if show:
+            if pf:
+                plt.plot(means, betas, label=f'OC')
+                plt.plot(means, powers, label=f'PF')
+            else:
+                plt.plot(means, betas, label=f'n = {nsize}')
 
     if len(ranges) == 3:
         xticks = np.arange(ranges[0], ranges[1] + 1, ranges[2])
@@ -300,16 +301,17 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(
         xticks = np.arange(ranges[0], ranges[1] + 1, 1)
     yticks = np.arange(0, 1.1, .1)
 
-    plt.xlabel("H1 Mean")
-    plt.xticks(xticks, rotation=45, fontsize=8)
-    plt.yticks(yticks, fontsize=8)
-    plt.ylabel("Probability of a Type II Error")
-    plt.margins(x=.01, tight=False)
-    if label:
-        plt.legend()
+    if show:
+        plt.xlabel("H1 Mean")
+        plt.xticks(xticks, rotation=45, fontsize=8)
+        plt.yticks(yticks, fontsize=8)
+        plt.ylabel("Probability of a Type II Error")
+        plt.margins(x=.01, tight=False)
+        if label:
+            plt.legend()
 
     if pf:
-        return fig, ax, means, betas, xticks, yticks
+        return means, betas, xticks, yticks
 
 
 def power_test(x_mean, h0_mean, std, n, alpha, h1_mean, option='left', precision=4, show=True, ignore=True):
@@ -382,12 +384,13 @@ Power of a Test = {ptest:.{precision}f}
     return type2_p, ptest
 
 
-def power_plot(h0_mean, psigma, nsizes, alpha, ranges, option='r', figsize=(12, 6)):
-    fig, ax, means, betas, xticks, yticks = type2_plot(
-        h0_mean, psigma, nsizes, alpha, ranges, option=option, figsize=figsize, pf=True, label=True)
-    plt.clf()
-    plt.plot(means, 1 - betas)
-    plt.xticks(xticks, rotation=45, fontsize=8)
-    plt.yticks(yticks, fontsize=8)
-    plt.title('Power Function Curve')
-    plt.margins(x=.01, tight=False)
+def power_plot(h0_mean, psigma, nsizes, alpha, ranges, option='r', figsize=(12, 6), show=True):
+    means, betas, xticks, yticks = type2_plot(
+        h0_mean, psigma, nsizes, alpha, ranges, option=option, figsize=figsize, pf=True, label=True, show=show)
+    if show:
+        plt.clf()
+        plt.plot(means, 1 - betas)
+        plt.xticks(xticks, rotation=45, fontsize=8)
+        plt.yticks(yticks, fontsize=8)
+        plt.title('Power Function Curve')
+        plt.margins(x=.01, tight=False)
