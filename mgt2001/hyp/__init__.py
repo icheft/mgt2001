@@ -359,8 +359,8 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(
 
         if pf:
             if show:
-                plt.plot(means, betas, label=f'OC')
-                plt.plot(means, powers, label=f'PF')
+                plt.plot(means, betas, label=f'OC ({nsize})')
+                plt.plot(means, powers, label=f'PF ({nsize})')
         else:
             if show:
                 plt.plot(means, betas, label=f'n = {nsize}')
