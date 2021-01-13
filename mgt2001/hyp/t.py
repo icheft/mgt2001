@@ -6,6 +6,12 @@ import scipy.stats as stats
 
 
 def con_level(x_bar, sigma, n, sig_level, show=True):
+    """
+Input: x_bar (x_mean), sigma (sample sigma), sample size, sig_level (alpha), show=True
+Return the confidence level at alpha. Return a dictionary: {"lcl": lcl, "ucl": ucl, "x_bar": x_bar, "t_value": t_value, "sig_x_bar": sig_x_bar}
+
++ `show`: default is `True`. Set to `False` to disable rendering.
+    """
     a = sig_level
     df_v = n - 1
     con_coef = 1 - a
@@ -25,6 +31,14 @@ t (Critical value): {t_value:.4f}
 
 
 def rejection_region_method(x_mean, mu, std, n, alpha, option='left', precision=4, show=True, ignore=False):
+    """
+    Input: x_mean, mu, std, n, alpha, option='left', precision=4, show=True, ignore=False
+    Output: 
+        if opt == 't':
+            return x_l, x_u
+        else:
+            return x_c
+    """
     opt = option.lower()[0]
     df_v = n - 1
     if opt == 't':
@@ -95,6 +109,14 @@ x_c (Critical value) = {x_c:.{precision}f}
 
 
 def testing_statistic_method(x_mean, mu, std, n, alpha, option='left', precision=4, ignore=False):
+    """
+    Input: x_mean, mu, std (sample std), n, alpha, option='left', precision=4, ignore=False
+    Output: 
+        if opt == 't':
+            return t, t_l, t_u
+        else:
+            return t, t_value
+    """
     df_v = n - 1
     opt = option.lower()[0]
     t = (x_mean - mu)/(std / math.sqrt(n))
@@ -178,6 +200,10 @@ def inter_p_value(p_value):
 
 
 def p_value_method(x_mean, h0_mean, std, samp_num, siglevel, option='left', precision=4):
+    """
+    Input: x_mean, h0_mean, std (standard deviation of sample), samp_num (sample size), siglevel (alpha), option='left', precision=4):
+    Output: zcv, p_value
+    """
     df_v = samp_num - 1
     t_value = (x_mean - h0_mean) / (std/(samp_num ** 0.5))
     alpha = siglevel
@@ -230,7 +256,13 @@ Significant Level (alpha) = {siglevel:.{precision}f}
 
 
 def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(12, 6), pf=False, label=True, show=True):
-    # 外面要自己 plt.show()
+    """
+    Caution: 外面要自己 plt.show()
+
+    Input: h0_mean, psigma, nsizes (list or one value), alpha, ranges, option='right', figsize=(12, 6), pf=False, label=True, show=True
+    → set show to false to only get the values for powers
+    Output: (if pf=True: means, betas, xticks, yticks)
+    """
 
     try:
         _ = iter(nsizes)
@@ -315,6 +347,10 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(
 
 
 def power_test(x_mean, h0_mean, std, n, alpha, h1_mean, option='left', precision=4, show=True, ignore=True):
+    """
+    Input: x_mean (not necessary if ignore=True), h0_mean, std, n, alpha, h1_mean, option='left', precision=4, show=True, ignore=True
+    Output: type2_p (beta), ptest (power of a test)
+    """
     opt = option.lower()[0]
     df_v = (n - 1)
     if opt == 't':

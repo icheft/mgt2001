@@ -9,7 +9,28 @@ from . import chi2
 from . import p
 
 
+"""
+Using z statistic for hypothesis testing and confidence intervals.
+
++ rejection_region_method(x_mean, mu, std, n, alpha, option='left', precision=4, show=True, ignore=False)
++ testing_statistic_method
++ p_value_method
++ power_test
++ sample_size
++ type2_plot
++ power_plot
+"""
+
+
 def rejection_region_method(x_mean, mu, std, n, alpha, option='left', precision=4, show=True, ignore=False):
+    """
+    Input: x_mean, mu, std, n, alpha, option='left', precision=4, show=True, ignore=False
+    Output: 
+        if opt == 't':
+            return x_l, x_u
+        else:
+            return x_c
+    """
     opt = option.lower()[0]
     if opt == 't':
         option = 'Two-Tail Test'
@@ -79,6 +100,14 @@ x_c (Critical value) = {x_c:.{precision}f}
 
 
 def testing_statistic_method(x_mean, mu, std, n, alpha, option='left', precision=4, ignore=False):
+    """
+    Input: x_mean, mu, std, n, alpha, option='left', precision=4, ignore=False
+    Output: 
+        if opt == 't':
+            return z, z_l, z_u
+        else:
+            return z, z_value
+    """
     opt = option.lower()[0]
     z = (x_mean - mu)/(std / math.sqrt(n))
     if opt == 't':
@@ -161,6 +190,10 @@ def inter_p_value(p_value):
 
 
 def p_value_method(x_mean, h0_mean, h0_std, samp_num, siglevel, option='left', precision=4):
+    """
+    Input: x_mean, h0_mean, h0_std (standard deviation of population), samp_num (sample size), siglevel (alpha), option='left', precision=4):
+    Output: zcv, p_value
+    """
     z_value = (x_mean - h0_mean) / (h0_std/(samp_num ** 0.5))
     alpha = siglevel
     opt = option.lower()[0]
@@ -212,6 +245,10 @@ Significant Level (alpha) = {siglevel:.{precision}f}
 
 
 def power_test(x_mean, h0_mean, std, n, alpha, h1_mean, option='left', precision=4, show=True, ignore=True):
+    """
+    Input: x_mean (not necessary if ignore=True), h0_mean, std, n, alpha, h1_mean, option='left', precision=4, show=True, ignore=True
+    Output: type2_p (beta), ptest (power of a test)
+    """
     opt = option.lower()[0]
     if opt == 't':
         option = 'Two-Tail Test'
@@ -280,6 +317,10 @@ Power of a Test = {ptest:.{precision}f}
 
 
 def sample_size(h0_mean, h1_mean, std, alpha, beta):
+    """
+    Input: h0_mean, h1_mean, std (population), alpha, beta
+    Output: desired sample size
+    """
     z_a = stats.norm.ppf(1 - alpha)
     z_b = stats.norm.ppf(1 - beta)
     n = (((z_a + z_b) * (std))**2) / ((h0_mean - h1_mean) ** 2)
@@ -299,7 +340,13 @@ def power_plot(h0_mean, psigma, nsizes, alpha, ranges, option='r', figsize=(12, 
 
 
 def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(12, 6), pf=False, label=True, show=True):
-    # 外面要自己 plt.show()
+    """
+    Caution: 外面要自己 plt.show()
+
+    Input: h0_mean, psigma, nsizes (list or one value), alpha, ranges, option='right', figsize=(12, 6), pf=False, label=True, show=True
+    → set show to false to only get the values for powers
+    Output: (if pf=True: means, betas, xticks, yticks)
+    """
 
     try:
         _ = iter(nsizes)

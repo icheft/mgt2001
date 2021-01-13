@@ -9,6 +9,7 @@ import random
 
 def to_xbar_freq(possible_outcome, repeat=1):
     """
+    Input: possible_outcome 
     Return a `DataFrame` that stores `x` values and its `prob` (probability).
     """
     xbar_all = []
@@ -26,12 +27,21 @@ def to_xbar_freq(possible_outcome, repeat=1):
 
 
 def sumprob(xfreq, bm=3, tp=4):
+    """
+    Input: a list of frequency, bottom limit, top limit
+    Output: sum
+    """
     tmpind1 = xfreq.x >= bm
     tmpind2 = xfreq.x <= tp
     return xfreq[tmpind1 & tmpind2].prob.sum()
 
 
 def returnZ(x, mu, std):
+    """
+Usage for sampling distribution of the difference between two means:
+
+z = mgt2001.samp.returnZ(x, mgt2001.samp.returnE(mu1, mu2), mgt2001.samp.returnStd(std1, std2, n1, n2))
+    """
     return (x - mu) / std
 
 
@@ -59,6 +69,7 @@ def returnVar(std1, std2, n1, n2):
 
 def con_level(x_bar, sigma, n, alpha, show=True):
     """
+Input: x_bar (x_mean), sigma, sample size, alpha, show=True
 Return the confidence level at $\alpha$. Return a dictionary: {"lcl": lcl, "ucl": ucl, "x_bar": x_bar, "z_value": z_value, "sig_x_bar": sig_x_bar}
 
 + `show`: default is `True`. Set to `False` to disable rendering.
@@ -81,11 +92,21 @@ Sigma of X-Bar: {sig_x_bar:.4f}
 
 
 def bound(a, std, n):
+    """
+    Calculate the bound.
+
+    Input: significance level, sigma, sample size
+    Output: bound
+    """
     z_value = stats.norm.ppf(1 - a / 2)
     return z_value * std / math.sqrt(n)
 
 
 def estimate_samp_size(bound, sig_level, sigma):
+    """
+    Input: bound, significance level, sigma
+    Output: the estimated sample size n (not rounded)
+    """
     a = sig_level
     z_value = stats.norm.ppf(1 - a / 2)
     n = math.pow(z_value * sigma / bound, 2)

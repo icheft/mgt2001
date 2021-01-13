@@ -6,6 +6,12 @@ import scipy.stats as stats
 
 
 def con_level(alpha, n, s, sigma, show=True, ignore=True):
+    """
+Input: alpha, n (sample size), s (sample standard deviation), sigma (population standard deviation, can ignore if ignore=True - default), show=True
+Return the confidence level at alpha. Return a dictionary: {"lcl": lcl, "ucl": ucl}
+
++ `show`: default is `True`. Set to `False` to disable rendering.
+    """
     df_v = n - 1
     con_coef = 1 - alpha
 
@@ -36,6 +42,14 @@ The interval {cover}
 
 
 def rejection_region_method(alpha, n, s, sigma, option='left', precision=4, show=True, ignore=False):
+    """
+    Input: alpha, n, s, sigma, option='left', precision=4, show=True, ignore=False
+    Output: 
+        if opt == 't':
+            return s2_l, s2_u
+        else:
+            return s2_c
+    """
     opt = option.lower()[0]
     df_v = n - 1
     var = s ** 2
@@ -112,6 +126,14 @@ S_C^2 (Critical value) = {s2_c:.{precision}f}
 
 
 def testing_statistic_method(alpha, n, s, sigma, option='left', precision=4, ignore=False):
+    """
+    Input: alpha, n, s, sigma, option='left', precision=4, show=True, ignore=False
+    Output: 
+        if opt == 't':
+            return chi2_value, chi2_cv_l, chi2_cv_u
+        else:
+            return chi2_value, chi2_cv
+    """
     opt = option.lower()[0]
     df_v = n - 1
     var = s ** 2
@@ -192,6 +214,10 @@ def inter_p_value(p_value):
 
 
 def p_value_method(alpha, n, s, sigma, option='left', precision=4):
+    """
+    Input: alpha, n, s, sigma, option='left', precision=4
+    Output: chi2_stat, p_value
+    """
     opt = option.lower()[0]
     df_v = n - 1
     var = s ** 2

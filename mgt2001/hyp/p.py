@@ -8,6 +8,10 @@ from .. import samp
 
 
 def samp_size(s_p, width, alpha):
+    """
+    Input: s_p (sample proportion), width, alpha
+    Output: Estimated sample size
+    """
     z_cv = stats.norm.ppf(1 - alpha / 2)
     return (z_cv * math.sqrt(s_p * (1 - s_p)) / width) ** 2
 
@@ -15,6 +19,19 @@ def samp_size(s_p, width, alpha):
 def con_level(s_p, n, alpha, show=True, Wilson=False, N=False, correction=True):
     """
     Caution: np̂ > 5 and n(1 - p̂) > 5
+    Input: s_p, n, alpha, show=True, Wilson=False, N=False, correction=True
+    Output: {"lat": lat, "lcl": lcl, "ucl": ucl, "z_cv": z_cv}
+
+    Note:
+        z_cv = stats.norm.ppf(1 - alpha / 2)
+        lat = z_cv * math.sqrt(s_p * (1 - s_p)/n)
+        or for Wilson: lat = z_cv * math.sqrt(s_p * (1 - s_p)/(n + 4))
+
+    Just in case:
+    if there is no need for correction, but is is corrected
+    go through 'lat' and do:
+        lcl = s_p - lat
+        ucl = s_p + lat
     """
     con_coef = 1 - alpha
     z_cv = stats.norm.ppf(1 - alpha / 2)
@@ -31,6 +48,11 @@ def con_level(s_p, n, alpha, show=True, Wilson=False, N=False, correction=True):
 
     if N:
         if n / N > 0.5 and correction:
+            print("Corrected...")
+            fpcf = math.sqrt((N - n)/(N - 1))
+            lcl = s_p - lat * fpcf
+            ucl = s_p + lat * fpcf
+        elif correction:
             print("Corrected...")
             fpcf = math.sqrt((N - n)/(N - 1))
             lcl = s_p - lat * fpcf
@@ -56,10 +78,18 @@ z_cv (Critical value): {z_cv:.4f}
     """
     if show:
         print(result)
-    return {"lcl": lcl, "ucl": ucl, "z_cv": z_cv}
+    return {"lat": lat, "lcl": lcl, "ucl": ucl, "z_cv": z_cv}
 
 
 def rejection_region_method(s_p, h0_p, nsize, alpha, option='left', precision=4, show=True, ignore=False):
+    """
+    Input: s_p, h0_p, nsize, alpha, option='left', precision=4, show=True, ignore=False
+    Output: 
+        if opt == 't':
+            return p_l, p_u
+        else:
+            return p_c
+    """
     opt = option.lower()[0]
     if not samp.check5(nsize, h0_p):
         print('Not satisfying np_0 > 5 and n(1 - p_0) > 5...')
@@ -130,6 +160,10 @@ p_c (Critical value) = {p_c:.{precision}f}
 
 
 def testing_statistic_method(s_p, h0_p, nsize, alpha, option='left', precision=4, ignore=False):
+    """
+    Input: s_p, h0_p, nsize, alpha, option='left', precision=4, ignore=False
+    Output: z_stats, z_cv
+    """
     opt = option.lower()[0]
     z_stats = (s_p - h0_p)/math.sqrt(h0_p * (1 - h0_p)/nsize)
     if not samp.check5(nsize, h0_p):
@@ -211,6 +245,10 @@ def inter_p_value(p_value):
 
 
 def p_value_method(s_p, h0_p, nsize, alpha, option='left', precision=4):
+    """
+    Input: s_p, h0_p, nsize, alpha, option='left', precision=4
+    Output: z_cv, z_stats, p_value
+    """
     opt = option.lower()[0]
     z_stats = (s_p - h0_p)/math.sqrt(h0_p * (1 - h0_p)/nsize)
     if not samp.check5(nsize, h0_p):
