@@ -26,7 +26,7 @@ setuptools.setup(
     )),
     author="Brian L. Chen",
     author_email="brian.lxchen@gmail.com",
-    description="A small package for MGT 2001 use only",
+    description="A small package for MGT 2001 and MGT 2002 use only",
     long_description_content_type="text/markdown",
     url="https://github.com/icheft/MGT2001_package",
     packages=setuptools.find_packages(),
