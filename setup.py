@@ -28,7 +28,7 @@ setuptools.setup(
     author_email="brian.lxchen@gmail.com",
     description="A small package for MGT 2001 and MGT 2002 use only",
     long_description_content_type="text/markdown",
-    url="https://github.com/icheft/MGT2001_package",
+    url="https://github.com/icheft/mgt2001",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
