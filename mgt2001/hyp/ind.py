@@ -48,6 +48,8 @@ Will return a result_dict regardless of stages.
     if const == 'e':
         rej_upper = stats.f.ppf(1 - alpha/2, df_1, df_2)
         rej_lower = stats.f.ppf(alpha/2, df_1, df_2)
+        result_dict['f_rej_upper'] = rej_upper
+        result_dict['f_rej_lower'] = rej_lower
         if f_value < rej_lower or f_value > rej_upper:
             flag = True
         else:
@@ -57,12 +59,14 @@ Will return a result_dict regardless of stages.
         rej_upper = stats.f.ppf(1 - alpha, df_1, df_2)
         rej_lower = stats.f.ppf(alpha, df_1, df_2)
         if const == 'r':
+            result_dict['f_rej_upper'] = rej_upper
             if f_value > rej_upper:
                 flag = True
             else:
                 flag = False
             text = 'σ_1/σ_2 > 1'
         else:
+            result_dict['f_rej_lower'] = rej_lower
             if f_value < rej_lower:
                 flag = True
             else:
