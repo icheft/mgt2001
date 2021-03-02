@@ -19,9 +19,13 @@ def inter_p_value(p_value):
 
 
 def two_population(a, b, alpha=.05, consistency='equal', option='right', show_table=False, stages=[1, 2, 3], show=True):
-    # First stage - consistency: equal, left (1 is more consistent than 2), right (2 is more consistent than 1)
-    # Second stage
-    # Third stage need to be separated
+    """
++ [First stage]: F Statistics - consistency: equal, left (1 is more consistent than 2), right (2 is more consistent than 1)
++ [Second stage]: t Test
++ [Third stage]: Confidence Interval
+
+Will return a result_dict regardless of stages.
+    """
     opt = option.lower()[0]
     const = consistency.lower()[0]
 
