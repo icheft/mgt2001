@@ -9,9 +9,9 @@
 <h4 align="center">A small package for MGT 2001 and MGT 2002 use only.</h4>
 
 <p align="center">
-  <a href="https://gitter.im/icheft/MGT2001">
-    <img src="https://badges.gitter.im/icheft/MGT2001.svg"
-         alt="Join the chat at https://gitter.im/icheft/MGT2001">
+  <a href="https://pypi.org/project/mgt2001/">
+    <img src="https://img.shields.io/pypi/v/mgt2001.svg?maxAge=3600"
+         alt="View package on PyPI">
   </a>
 </p>
 

@@ -96,28 +96,28 @@ Reject H_0 ({text}) → {flag}
                 result_dict['t_p_value'] = t_summary[1]
                 result_dict['df'] = df_1 + df_2
                 results += f"""
-            2. t Test      
-    ==============================
-    t (Observed value) = {t_summary[0]}
-    p-value (two-tail) = {t_summary[1]} ({inter_p_value(t_summary[1])})
-    t (Critical, two-tail) = {t_critical_two}
-    DF = {df_1 + df_2}
-    Reject H_0 → {flag}
-    """
+        2. t Test      
+==============================
+t (Observed value) = {t_summary[0]}
+p-value (two-tail) = {t_summary[1]} ({inter_p_value(t_summary[1])})
+t (Critical, two-tail) = {t_critical_two}
+DF = {df_1 + df_2}
+Reject H_0 → {flag}
+"""
             else:
                 flag = t_summary[1] / 2 < alpha
                 result_dict['t_observed_value'] = t_summary[0]
                 result_dict['t_p_value'] = t_summary[1] / 2
                 result_dict['df'] = df_1 + df_2
                 results += f"""
-            2. t Test      
-    ==============================
-    t (Observed value) = {t_summary[0]}
-    p-value (one-tail) = {t_summary[1] / 2} ({inter_p_value(t_summary[1] / 2)})
-    t (Critical, one-tail) = {t_critical_one}
-    DF = {df_1 + df_2}
-    Reject H_0 → {flag}
-    """
+        2. t Test      
+==============================
+t (Observed value) = {t_summary[0]}
+p-value (one-tail) = {t_summary[1] / 2} ({inter_p_value(t_summary[1] / 2)})
+t (Critical, one-tail) = {t_critical_one}
+DF = {df_1 + df_2}
+Reject H_0 → {flag}
+"""
             if 3 in stages:
                 cm_result = sms.CompareMeans(
                     sms.DescrStatsW(a), sms.DescrStatsW(b))
@@ -129,10 +129,10 @@ Reject H_0 ({text}) → {flag}
                 # record result
                 result_dict['conf_interval'] = conf_interval
                 results += f"""
-                3. Confidence Interval      
-        ==============================
-        {con_coef * 100:.1f}% Confidence Interval: [{conf_interval[0]:.4f}, {conf_interval[1]:.4f}]
-        """
+        3. Confidence Interval      
+==============================
+{con_coef * 100:.1f}% Confidence Interval: [{conf_interval[0]:.4f}, {conf_interval[1]:.4f}]
+"""
         else:
             ttest_result = stats.ttest_ind(a, b, equal_var=True)
             t_summary = list(ttest_result)
@@ -152,14 +152,14 @@ Reject H_0 ({text}) → {flag}
                 result_dict['df'] = df_1 + df_2
 
                 results += f"""
-            2. t Test      
-    ==============================
-    t (Observed value) = {t_summary[0]}
-    p-value (two-tail) = {t_summary[1]} ({inter_p_value(t_summary[1])})
-    t (Critical, two-tail) = {t_critical_two}
-    DF = {df_1 + df_2}
-    Reject H_0 → {flag}
-    """
+        2. t Test      
+==============================
+t (Observed value) = {t_summary[0]}
+p-value (two-tail) = {t_summary[1]} ({inter_p_value(t_summary[1])})
+t (Critical, two-tail) = {t_critical_two}
+DF = {df_1 + df_2}
+Reject H_0 → {flag}
+"""
             else:
                 flag = t_summary[1] / 2 < alpha
                 result_dict['t_observed_value'] = t_summary[0]
@@ -167,14 +167,14 @@ Reject H_0 ({text}) → {flag}
                 result_dict['df'] = df_1 + df_2
 
                 results += f"""
-            2. t Test      
-    ==============================
-    t (Observed value) = {t_summary[0]}
-    p-value (one-tail) = {t_summary[1] / 2} ({inter_p_value(t_summary[1] / 2)})
-    t (Critical, one-tail) = {t_critical_one}
-    DF = {df_1 + df_2}
-    Reject H_0 → {flag}
-    """
+        2. t Test      
+==============================
+t (Observed value) = {t_summary[0]}
+p-value (one-tail) = {t_summary[1] / 2} ({inter_p_value(t_summary[1] / 2)})
+t (Critical, one-tail) = {t_critical_one}
+DF = {df_1 + df_2}
+Reject H_0 → {flag}
+"""
             if 3 in stages:
                 cm_result = sms.CompareMeans(
                     sms.DescrStatsW(a), sms.DescrStatsW(b))
@@ -185,10 +185,10 @@ Reject H_0 ({text}) → {flag}
                 result_dict['conf_interval'] = conf_interval
                 con_coef = 1 - alpha
                 results += f"""
-                3. Confidence Interval      
-        ==============================
-        {con_coef * 100:.1f}% Confidence Interval: [{conf_interval[0]:.4f}, {conf_interval[1]:.4f}]
-        """
+        3. Confidence Interval      
+==============================
+{con_coef * 100:.1f}% Confidence Interval: [{conf_interval[0]:.4f}, {conf_interval[1]:.4f}]
+"""
 
         if show_table == True and 3 in stages:
             results += f"""{conf_table.as_text()}"""
