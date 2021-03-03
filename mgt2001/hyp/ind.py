@@ -301,7 +301,7 @@ def two_population_proportion(a, b, D, option='right', alpha=0.05, precision=4, 
         flag = p_value < alpha
         sub_result = f'''Using {text}:
 z (Observed value, {text}) = {z_value:.{precision}f}
-z (Critical value, {text}) = {-zcv:.{precision}f}, {z_cv:.{precision}f}
+z (Critical value, {text}) = {-zcv:.{precision}f}, {zcv:.{precision}f}
 p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
 Reject H_0 → {flag}'''
     else:
