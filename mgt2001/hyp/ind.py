@@ -41,11 +41,12 @@ Will return a result_dict regardless of stages.
     result_dict['varall'] = varall
     result_dict['f_value'] = f_value
 
-    p_value = 1 - stats.f.cdf(f_value, df_1, df_2)
-    if const != 'e':
-        p_value /= 2
+    ptmp = stats.f.cdf(f_value, df_1, df_2)
 
     if const == 'e':
+        if ptmp > 0.5:
+            ptmp = 1 - ptmp
+        p_value = ptmp * 2
         rej_upper = stats.f.ppf(1 - alpha/2, df_1, df_2)
         rej_lower = stats.f.ppf(alpha/2, df_1, df_2)
         result_dict['f_rej_upper'] = rej_upper
@@ -60,6 +61,7 @@ Will return a result_dict regardless of stages.
         rej_lower = stats.f.ppf(alpha, df_1, df_2)
         if const == 'r':
             result_dict['f_rej_upper'] = rej_upper
+            p_value = 1 - ptmp
             if f_value > rej_upper:
                 flag = True
             else:
@@ -67,6 +69,7 @@ Will return a result_dict regardless of stages.
             text = 'σ_1/σ_2 > 1'
         else:
             result_dict['f_rej_lower'] = rej_lower
+            p_value = ptmp
             if f_value < rej_lower:
                 flag = True
             else:
