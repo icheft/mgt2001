@@ -324,6 +324,7 @@ Reject H_0 → {flag}'''
 
     zcv = stats.norm.ppf(1 - alpha/2)
     con_coef = 1 - alpha
+    sd_p = (p1 * (1-p1) / n1 + p2 * (1 - p2) / n2) ** 0.5  # always
     LCL = p1-p2 - zcv*sd_p
     UCL = p1-p2 + zcv*sd_p
     conf_interval = [LCL, UCL]
