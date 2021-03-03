@@ -78,7 +78,7 @@ Will return a result_dict regardless of stages.
 
     result_dict['p_value'] = p_value
 
-    results = f"""        1. F Statistics      
+    results = f"""        1. F Statistics
 ===================================
 F statistic = {f_value:.{precision}f}
 p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
@@ -86,10 +86,7 @@ Reject H_0 ({text}) → {flag}
 """
     if 2 in stages:
         if matched_pairs:
-            samp1 = a.values
-            samp2 = a.values
-
-            samp_diff = samp1 - samp2
+            samp_diff = a - b
             nobs = samp_diff.shape[0]
             df = nobs - 1
 
@@ -99,12 +96,15 @@ Reject H_0 ({text}) → {flag}
             # p-values
             ptmp = stats.t.cdf(t_value, df)
             if opt == 'r':
+                text = 'one-tail'
                 tcv = stats.t.ppf(1 - alpha, df=df)
                 p_value = 1 - ptmp
             elif opt == 'l':
+                text = 'one-tail'
                 p_value = ptmp
                 tcv = stats.t.ppf(alpha, df=df)
-            elif opt == 't':
+            else:
+                text = 'two-tail'
                 tcv = stats.t.ppf(1 - alpha/2, df=df)
                 if ptmp > 0.5:
                     ptmp = 1 - ptmp
@@ -115,8 +115,8 @@ Reject H_0 ({text}) → {flag}
         2. t Test      
 ===================================
 t (Observed value) = {t_value:.{precision}f}
-p-value (two-tail) = {p_value:.{precision}f} ({inter_p_value(p_value)})
-t (Critical, two-tail) = {tcv:.{precision}f}
+p-value ({text}) = {p_value:.{precision}f} ({inter_p_value(p_value)})
+t (Critical, ({text})) = {tcv:.{precision}f}
 DF = {(df):.{precision}f}
 Reject H_0 → {flag}
 """
