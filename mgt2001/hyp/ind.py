@@ -27,58 +27,61 @@ def two_population(a, b, alpha=.05, consistency='equal', option='right', show_ta
 Will return a result_dict regardless of stages.
     """
     opt = option.lower()[0]
+    results = ""
+
     const = consistency.lower()[0]
 
     result_dict = dict()
 
     df_1 = len(a) - 1
     df_2 = len(b) - 1
+    if 1 in stages:
 
-    varall = [stats.describe(a).variance,
-              stats.describe(b).variance]
-    f_value = varall[0] / varall[1]
+        varall = [stats.describe(a).variance,
+                  stats.describe(b).variance]
+        f_value = varall[0] / varall[1]
 
-    result_dict['varall'] = varall
-    result_dict['f_value'] = f_value
+        result_dict['varall'] = varall
+        result_dict['f_value'] = f_value
 
-    ptmp = stats.f.cdf(f_value, df_1, df_2)
+        ptmp = stats.f.cdf(f_value, df_1, df_2)
 
-    if const == 'e':
-        if ptmp > 0.5:
-            ptmp = 1 - ptmp
-        p_value = ptmp * 2
-        rej_upper = stats.f.ppf(1 - alpha/2, df_1, df_2)
-        rej_lower = stats.f.ppf(alpha/2, df_1, df_2)
-        result_dict['f_rej_upper'] = rej_upper
-        result_dict['f_rej_lower'] = rej_lower
-        if f_value < rej_lower or f_value > rej_upper:
-            flag = True
-        else:
-            flag = False
-        text = 'unequal variances'
-    else:
-        rej_upper = stats.f.ppf(1 - alpha, df_1, df_2)
-        rej_lower = stats.f.ppf(alpha, df_1, df_2)
-        if const == 'r':
+        if const == 'e':
+            if ptmp > 0.5:
+                ptmp = 1 - ptmp
+            p_value = ptmp * 2
+            rej_upper = stats.f.ppf(1 - alpha/2, df_1, df_2)
+            rej_lower = stats.f.ppf(alpha/2, df_1, df_2)
             result_dict['f_rej_upper'] = rej_upper
-            p_value = 1 - ptmp
-            if f_value > rej_upper:
-                flag = True
-            else:
-                flag = False
-            text = 'σ_1/σ_2 > 1'
-        else:
             result_dict['f_rej_lower'] = rej_lower
-            p_value = ptmp
-            if f_value < rej_lower:
+            if f_value < rej_lower or f_value > rej_upper:
                 flag = True
             else:
                 flag = False
-            text = 'σ_1/σ_2 < 1'
+            text = 'unequal variances'
+        else:
+            rej_upper = stats.f.ppf(1 - alpha, df_1, df_2)
+            rej_lower = stats.f.ppf(alpha, df_1, df_2)
+            if const == 'r':
+                result_dict['f_rej_upper'] = rej_upper
+                p_value = 1 - ptmp
+                if f_value > rej_upper:
+                    flag = True
+                else:
+                    flag = False
+                text = 'σ_1/σ_2 > 1'
+            else:
+                result_dict['f_rej_lower'] = rej_lower
+                p_value = ptmp
+                if f_value < rej_lower:
+                    flag = True
+                else:
+                    flag = False
+                text = 'σ_1/σ_2 < 1'
 
-    result_dict['p_value'] = p_value
+        result_dict['p_value'] = p_value
 
-    results = f"""        1. F Statistics
+        results = f"""          F Statistics
 ===================================
 F statistic = {f_value:.{precision}f}
 p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
@@ -112,7 +115,7 @@ Reject H_0 ({text}) → {flag}
 
             flag = p_value < alpha
             results += f"""
-        2. t Test      
+           t Test      
 ===================================
 t (Observed value) = {t_value:.{precision}f}
 p-value ({text}) = {p_value:.{precision}f} ({inter_p_value(p_value)})
@@ -131,7 +134,7 @@ Reject H_0 → {flag}
             conf_interval = [LCL, UCL]
             result_dict['conf_interval'] = conf_interval
             results += f"""
-        3. Confidence Interval      
+           Confidence Interval      
 ===================================
 {con_coef * 100:.1f}% Confidence Interval: [{LCL:.{precision}f}, {UCL:.{precision}f}]
 """
@@ -154,7 +157,7 @@ Reject H_0 → {flag}
                     result_dict['t_p_value'] = t_summary[1]
                     result_dict['df'] = df_1 + df_2
                     results += f"""
-        2. t Test      
+           t Test      
 ===================================
 t (Observed value) = {t_summary[0]:.{precision}f}
 p-value (two-tail) = {t_summary[1]:.{precision}f} ({inter_p_value(t_summary[1])})
@@ -168,7 +171,7 @@ Reject H_0 → {flag}
                     result_dict['t_p_value'] = t_summary[1] / 2
                     result_dict['df'] = df_1 + df_2
                     results += f"""
-        2. t Test      
+           t Test      
 ===================================
 t (Observed value) = {t_summary[0]:.{precision}f}
 p-value (one-tail) = {(t_summary[1] / 2):.{precision}f} ({inter_p_value(t_summary[1] / 2)})
@@ -188,7 +191,7 @@ Reject H_0 → {flag}
                     # record result
                     result_dict['conf_interval'] = conf_interval
                     results += f"""
-        3. Confidence Interval      
+           Confidence Interval      
 ===================================
 {con_coef * 100:.1f}% Confidence Interval: [{conf_interval[0]:.{precision}f}, {conf_interval[1]:.{precision}f}]
 """
@@ -211,7 +214,7 @@ Reject H_0 → {flag}
                     result_dict['df'] = df_1 + df_2
 
                     results += f"""
-        2. t Test      
+           t Test      
 ===================================
 t (Observed value) = {t_summary[0]:.{precision}f}
 p-value (two-tail) = {t_summary[1]:.{precision}f} ({inter_p_value(t_summary[1])})
@@ -226,7 +229,7 @@ Reject H_0 → {flag}
                     result_dict['df'] = df_1 + df_2
 
                     results += f"""
-        2. t Test      
+           t Test      
 ===================================
 t (Observed value) = {t_summary[0]:.{precision}f}
 p-value (one-tail) = {(t_summary[1] / 2):.{precision}f} ({inter_p_value(t_summary[1] / 2)})
@@ -245,7 +248,7 @@ Reject H_0 → {flag}
                     result_dict['conf_interval'] = conf_interval
                     con_coef = 1 - alpha
                     results += f"""
-        3. Confidence Interval      
+           Confidence Interval      
 ===================================
 {con_coef * 100:.1f}% Confidence Interval: [{conf_interval[0]:.{precision}f}, {conf_interval[1]:.{precision}f}]
 """
