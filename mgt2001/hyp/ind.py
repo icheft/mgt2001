@@ -256,3 +256,86 @@ Reject H_0 → {flag}
     if show == True:
         print(results)
     return result_dict
+
+
+def two_population_proportion(a, b, D, option='right', alpha=0.05, precision=4, show=True):
+
+    opt = option.lower()[0]
+
+    p1 = a.mean()
+    p2 = b.mean()
+    n1, n2 = len(a), len(b)
+    result_dict = dict()
+    result_dict['D'] = D
+    result_dict['p1'] = p1
+    result_dict['p2'] = p2
+    result_dict['n1'] = n1
+    result_dict['n2'] = n2
+
+    if D == 0:
+        ab_concat = np.concatenate([a, b])
+        p_pool = ab_concat.mean()
+        sd_p = (p_pool * (1 - p_pool) *
+                (1 / n1 + 1 / n2)) ** 0.5
+    else:
+        sd_p = (p1 * (1-p1) / n1 + p2 * (1 - p2) / n2) ** 0.5
+
+    result_dict['sd_p'] = sd_p
+    z_value = ((p1 - p2) - D) / sd_p
+
+    result_dict['z_value'] = z_value
+
+    p_value = 1 - stats.norm.cdf(z_value)  # right
+
+    if opt == 't':
+        # two-tail test
+        text = 'Two-Tail Test'
+        if p_value > 0.5:
+            p_value = 1 - p_value
+        p_value *= 2
+
+        zcv = stats.norm.ppf(1 - alpha/2)
+        flag = p_value < alpha
+        sub_result = f'''Using {text}:
+z (Observed value, {text}) = {z_value:.{precision}f}
+z (Critical value, {text}) = {-zcv:.{precision}f}, {z_cv:.{precision}f}
+p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
+Reject H_0 → {flag}'''
+    else:
+        if opt == 'l':
+            text = 'One-Tail Test (left tail)'
+            p_value = stats.norm.cdf(z_value)
+            zcv = -stats.norm.ppf(1 - alpha)
+        elif opt == 'r':
+            text = 'One-Tail Test (right tail)'
+            zcv = stats.norm.ppf(1 - alpha)
+        flag = p_value < alpha
+        sub_result = f'''Using {text}:
+z (Observed value) = {z_value:.{precision}f}
+z (Critical value) = {zcv:.{precision}f}
+p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
+Reject H_0 → {flag}'''
+
+    result_dict['p_value'] = p_value
+    result_dict['zcv'] = zcv
+
+    zcv = stats.norm.ppf(1 - alpha/2)
+    con_coef = 1 - alpha
+    LCL = p1-p2 - zcv*sd_p
+    UCL = p1-p2 + zcv*sd_p
+    conf_interval = [LCL, UCL]
+    result_dict['conf_interval'] = conf_interval
+
+    result = f"""======= Inf. Two Population Proportions =======
+D = {D:.{precision}f}
+p1 = {p1:.{precision}f}
+p2 = {p2:.{precision}f}
+
+""" + sub_result + f"""
+
+{con_coef * 100:.1f}% Confidence Interval: [{LCL:.{precision}f}, {UCL:.{precision}f}]"""
+
+    if show:
+        print(result)
+
+    return result_dict
