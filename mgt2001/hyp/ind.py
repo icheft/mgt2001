@@ -18,7 +18,7 @@ def inter_p_value(p_value):
     return inter_p
 
 
-def two_population(a, b, alpha=.05, consistency='equal', option='right', show_table=False, stages=[1, 2, 3], show=True):
+def two_population(a, b, alpha=.05, consistency='equal', option='right', show_table=False, stages=[1, 2, 3], show=True, precision=4):
     """
 + [First stage]: F Statistics - consistency: equal, left (1 is more consistent than 2), right (2 is more consistent than 1)
 + [Second stage]: t Test
@@ -80,8 +80,8 @@ Will return a result_dict regardless of stages.
 
     results = f"""        1. F Statistics      
 ==============================
-F statistic = {f_value}
-p-value = {p_value} ({inter_p_value(p_value)})
+F statistic = {f_value:.{precision}f}
+p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
 Reject H_0 ({text}) → {flag}
 """
     if 2 in stages:
@@ -105,10 +105,10 @@ Reject H_0 ({text}) → {flag}
                 results += f"""
         2. t Test      
 ==============================
-t (Observed value) = {t_summary[0]}
-p-value (two-tail) = {t_summary[1]} ({inter_p_value(t_summary[1])})
-t (Critical, two-tail) = {t_critical_two}
-DF = {df_1 + df_2}
+t (Observed value) = {t_summary[0]:.{precision}f}
+p-value (two-tail) = {t_summary[1]:.{precision}f} ({inter_p_value(t_summary[1])})
+t (Critical, two-tail) = {t_critical_two:.{precision}f}
+DF = {(df_1 + df_2):.{precision}f}
 Reject H_0 → {flag}
 """
             else:
@@ -119,10 +119,10 @@ Reject H_0 → {flag}
                 results += f"""
         2. t Test      
 ==============================
-t (Observed value) = {t_summary[0]}
-p-value (one-tail) = {t_summary[1] / 2} ({inter_p_value(t_summary[1] / 2)})
-t (Critical, one-tail) = {t_critical_one}
-DF = {df_1 + df_2}
+t (Observed value) = {t_summary[0]:.{precision}f}
+p-value (one-tail) = {(t_summary[1] / 2):.{precision}f} ({inter_p_value(t_summary[1] / 2)})
+t (Critical, one-tail) = {t_critical_one:.{precision}f}
+DF = {(df_1 + df_2):.{precision}f}
 Reject H_0 → {flag}
 """
             if 3 in stages:
@@ -138,7 +138,7 @@ Reject H_0 → {flag}
                 results += f"""
         3. Confidence Interval      
 ==============================
-{con_coef * 100:.1f}% Confidence Interval: [{conf_interval[0]:.4f}, {conf_interval[1]:.4f}]
+{con_coef * 100:.1f}% Confidence Interval: [{conf_interval[0]:.{precision}f}, {conf_interval[1]:.{precision}f}]
 """
         else:
             ttest_result = stats.ttest_ind(a, b, equal_var=True)
@@ -161,10 +161,10 @@ Reject H_0 → {flag}
                 results += f"""
         2. t Test      
 ==============================
-t (Observed value) = {t_summary[0]}
-p-value (two-tail) = {t_summary[1]} ({inter_p_value(t_summary[1])})
-t (Critical, two-tail) = {t_critical_two}
-DF = {df_1 + df_2}
+t (Observed value) = {t_summary[0]:.{precision}f}
+p-value (two-tail) = {t_summary[1]:.{precision}f} ({inter_p_value(t_summary[1])})
+t (Critical, two-tail) = {t_critical_two:.{precision}f}
+DF = {(df_1 + df_2):.{precision}f}
 Reject H_0 → {flag}
 """
             else:
@@ -176,10 +176,10 @@ Reject H_0 → {flag}
                 results += f"""
         2. t Test      
 ==============================
-t (Observed value) = {t_summary[0]}
-p-value (one-tail) = {t_summary[1] / 2} ({inter_p_value(t_summary[1] / 2)})
-t (Critical, one-tail) = {t_critical_one}
-DF = {df_1 + df_2}
+t (Observed value) = {t_summary[0]:.{precision}f}
+p-value (one-tail) = {(t_summary[1] / 2):.{precision}f} ({inter_p_value(t_summary[1] / 2)})
+t (Critical, one-tail) = {t_critical_one:.{precision}f}
+DF = {(df_1 + df_2):.{precision}f}
 Reject H_0 → {flag}
 """
             if 3 in stages:
@@ -194,7 +194,7 @@ Reject H_0 → {flag}
                 results += f"""
         3. Confidence Interval      
 ==============================
-{con_coef * 100:.1f}% Confidence Interval: [{conf_interval[0]:.4f}, {conf_interval[1]:.4f}]
+{con_coef * 100:.1f}% Confidence Interval: [{conf_interval[0]:.{precision}f}, {conf_interval[1]:.{precision}f}]
 """
 
         if show_table == True and 3 in stages:
