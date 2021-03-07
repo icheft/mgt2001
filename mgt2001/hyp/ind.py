@@ -261,6 +261,13 @@ Reject H_0 → {flag}
     return result_dict
 
 
+def _check_normality(n1, n2, p1, p2):
+    if n1 * p1 >= 5 and n2 * p2 >= 5 and n1 * (1-p1) >= 5 and n2 * (1-p2) >= 5:
+        return True
+    else:
+        return False
+
+
 def two_population_proportion(a, b, D, option='right', alpha=0.05, precision=4, show=True):
 
     opt = option.lower()[0]
@@ -274,6 +281,8 @@ def two_population_proportion(a, b, D, option='right', alpha=0.05, precision=4, 
     result_dict['p2'] = p2
     result_dict['n1'] = n1
     result_dict['n2'] = n2
+
+    result_dict['Normal'] = _check_normality(n1, n2, p1, p2)
 
     if D == 0:
         ab_concat = np.concatenate([a, b])
