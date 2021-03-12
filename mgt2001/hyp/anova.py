@@ -45,8 +45,9 @@ def bartlett(df, treatment_name_list, treatment_name, value_name):
     data = []
     for i, name in enumerate(treatment_name_list):
         data.append(df[value_name][df[treatment_name] == name])
-
-    return stats.bartlett(data)
+    stat = stats.bartlett(*data)
+    print(f'p-value: {stat[1]}')
+    return stat
 
 
 def f_oneway(data, treatment_name, value_name):
