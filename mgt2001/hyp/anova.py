@@ -10,13 +10,20 @@ import statsmodels.formula.api as smf
 
 
 def shapiro(df, treatment_name_list, treatment_name, value_name):
+    """
+    check normal distribution
+    """
     for i, name in enumerate(treatment_name_list):
         data = df[value_name][df[treatment_name] == name]
         stat, p = stats.shapiro(data)
         print(f'{i + 1}: Statistics={stat:.4f}, p={p:.4f}')
+    return
 
 
 def qq_plot(row, col, df, treatment_name_list, treatment_name, value_name, figsize=(8, 3), hspace=0.4, wspace=4):
+    """
+    check normal distribution
+    """
     fig = plt.figure(figsize=figsize)
     fig.subplots_adjust(hspace=hspace, wspace=wspace)
 
@@ -28,6 +35,18 @@ def qq_plot(row, col, df, treatment_name_list, treatment_name, value_name, figsi
 
     fig.tight_layout()
     plt.show()
+    return
+
+
+def bartlett(df, treatment_name_list, treatment_name, value_name):
+    """
+    Equal Variances (barlett's Test)
+    """
+    data = []
+    for i, name in enumerate(treatment_name_list):
+        data.append(df[value_name][df[treatment_name] == name])
+
+    return stats.bartlett(data)
 
 
 def f_oneway(data, treatment_name, value_name):
