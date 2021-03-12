@@ -8,6 +8,7 @@ from . import t
 from . import chi2
 from . import p
 from . import ind
+from . import anova
 
 
 """
