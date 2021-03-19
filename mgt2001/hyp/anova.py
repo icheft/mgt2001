@@ -52,7 +52,7 @@ def bartlett(df, treatment_name_list, treatment_name, value_name):
 
 def f_oneway(data, treatment_name, value_name):
     """
-    return aov_table, render_table, f_stat, p_value
+    return results, aov_table, render_table, f_stat, p_value
     """
     results = smf.ols(f'{value_name} ~ C({treatment_name})', data=data).fit()
     aov_table = sms.anova_lm(results, typ=2)
@@ -63,7 +63,7 @@ def f_oneway(data, treatment_name, value_name):
     # render_table.index = ['Treatment', 'Error']
     render_table.loc['Total'] = render_table.sum()
     print(f'p-value: {p_value}')
-    return aov_table, render_table, f_stat, p_value
+    return results, aov_table, render_table, f_stat, p_value
 
 
 def f_random_block(data, treatment_name, block_name, value_name, precision=4):
@@ -86,4 +86,4 @@ def f_random_block(data, treatment_name, block_name, value_name, precision=4):
     render_table.loc['Total', ['F', 'p-value']] = np.nan
     print(
         f'Treatment p-value (main): {treatment_p_value:.{precision}f}\nBlock p-value: {block_p_value:.{precision}f}')
-    return aov_table, render_table, treatment_f_stat, treatment_p_value, block_f_stat, block_p_value
+    return results, aov_table, render_table, treatment_f_stat, treatment_p_value, block_f_stat, block_p_value
