@@ -64,3 +64,26 @@ def f_oneway(data, treatment_name, value_name):
     render_table.loc['Total'] = render_table.sum()
     print(f'p-value: {p_value}')
     return aov_table, render_table, f_stat, p_value
+
+
+def f_random_block(data, treatment_name, block_name, value_name, precision=4):
+    """
+    return aov_table, render_table, treatment_f_stat, treatment_p_value, block_f_stat, block_p_value
+    """
+    results = smf.ols(
+        f'{value_name} ~ C({treatment_name}) + C({block_name})', data=data).fit()
+    aov_table = sms.anova_lm(results, typ=2)
+
+    treatment_f_stat, treatment_p_value = aov_table['F'][0], aov_table['PR(>F)'][0]
+    block_f_stat, block_p_value = aov_table['F'][1], aov_table['PR(>F)'][1]
+    render_table = aov_table.copy()
+    render_table.columns = ['Sum of Squares',
+                            'Degree of Freedom', 'F', 'p-value']
+
+    render_table.index = ['Treatment', 'Block', 'Error']
+
+    render_table.loc['Total'] = render_table.sum()
+    render_table.loc['Total', ['F', 'p-value']] = np.nan
+    print(
+        f'Treatment p-value (main): {treatment_p_value:.{precision}f}\nBlock p-value: {block_p_value:.{precision}f}')
+    return aov_table, render_table, treatment_f_stat, treatment_p_value, block_f_stat, block_p_value
