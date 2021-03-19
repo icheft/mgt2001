@@ -109,5 +109,5 @@ def f_twoway(data, factorA_name, factorB_name, value_name, precision=4):
     render_table.loc['Total'] = render_table.sum()
     render_table.loc['Total', ['F', 'p-value']] = np.nan
     print(
-        f'Factor A\'s p-value (main): {factorA_p_value:.{precision}f}\nFactor B\'s p-value: {factorB_p_value:.{precision}f}\nInteraction p-value: {inter_p_value:.{precision}f}')
+        f'Factor A\'s p-value: {factorA_p_value:.{precision}f}\nFactor B\'s p-value: {factorB_p_value:.{precision}f}\nInteraction p-value: {inter_p_value:.{precision}f}')
     return results, aov_table, render_table, factorA_f_stat, factorA_p_value, factorB_f_stat, factorB_p_value, inter_f_stat, inter_p_value
