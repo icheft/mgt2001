@@ -296,6 +296,8 @@ p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
 
 Reject H_0 (does not follow the probability) → {flag}
 """
+    print(result)
+    return stat, chi2_cv, p_value
 
 
 def contingency(cont_table=None, precision=4):
