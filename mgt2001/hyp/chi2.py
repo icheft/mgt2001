@@ -271,3 +271,116 @@ Significant Level (alpha) = {alpha:.{precision}f}
     print(result)
 
     return chi2_stat, p_value
+
+# Chi-Squared Tests for two or more variables
+
+
+def multinomial(freq_o, freq_e, alpha=0.05, precision=4):
+    """
+    Check RULE of FIVE before running the test
+    >>> if np.sum(freq_e < 5) > 0:
+    >>>    print("Rule of five is not met. ")
+    """
+    stat, p_value = stats.chisquare(freq_o, freq_e)
+    df = freq_o.shape[0]-1
+    chi2_cv = stats.chi2.ppf(1 - alpha, df)
+    flag = False
+    if p_value < 0.05:
+        flag = True
+    result = f"""======= Goodness of Fit Test: A Multinomial Populatio =======
+Chi-squared test: 
+chi2 statistics = {stat:.{precision}f}
+chi2 critical value = {chi2_cv:.{precision}f}
+Degree of freedom = {df}
+p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
+
+Reject H_0 (does not follow the probability) → {flag}
+"""
+
+
+def contingency(cont_table=None, precision=4):
+    """
+    Check RULE of FIVE before running the test
+    """
+    chi2, p, dof, ex = stats.chi2_contingency(cont_table, correction=False)
+    result = f"""======= Tests of Independence: Contingency Table =======
+chi2 Statistics = {chi2:.{precision}f}
+Degree of freedom = {dof}
+p-value = {p:.{precision}f}
+Expected Frequency:
+{ex}
+"""
+    print(result)
+    return chi2, p, dof, ex
+
+# Poisson
+
+
+def frequency_table(interval, observed, nobs, total_time, mu):
+    o_vs_e_freq_df = pd.DataFrame(columns=['i', 'f_i', 'e_i', 'f_i - e_i'])
+    poisson_table = stats.poisson(mu)
+    N = total_time
+    for (i, f) in zip(interval, observed):
+        e = poisson_table.pmf(i)
+        e *= N
+        o_vs_e_freq_df = o_vs_e_freq_df.append(
+            {'i': i, 'f_i': f, 'e_i': e, 'f_i - e_i': f - e}, ignore_index=True)
+    return o_vs_e_freq_df
+
+
+def df_combine(df=None, to_combine=None):
+    """
+    >>> to_combine = [[0,1,2],[10, 11, 12]]
+    >>> updated_df = df_combine(df=o_vs_e_freq_df, to_combine=to_combine)
+    """
+    if len(to_combine) == 0:
+        return df
+    else:
+        updated_df = pd.DataFrame(columns=['i', 'f_i', 'e_i', 'f_i - e_i'])
+        n = len(to_combine)
+        for i in range(n):
+            if i == 0:
+                current_end = to_combine[i][-1]
+                if i + 1 < n:
+                    next_start = to_combine[i + 1][0]
+                else:
+                    next_start = None
+                updated_df = updated_df.append(
+                    df.iloc[to_combine[i]].sum(axis=0), ignore_index=True)
+                updated_df.i[i] = f'{to_combine[i]}'
+                updated_df = updated_df.append(
+                    df.iloc[current_end + 1:next_start], ignore_index=True)
+            else:
+                current_start = to_combine[i][0]
+                prev_end = to_combine[i - 1][-1]
+                current_end = to_combine[i][-1]
+                if i + 1 < n:
+                    next_start = to_combine[i + 1][0]
+                else:
+                    next_start = None
+                updated_df = updated_df.append(
+                    df.iloc[to_combine[i]].sum(axis=0), ignore_index=True)
+                updated_df.iloc[current_start - prev_end +
+                                (i - 1), 0] = f'{to_combine[i]}'
+                updated_df = updated_df.append(
+                    df.iloc[current_end + 1:next_start], ignore_index=True)
+
+        return updated_df
+
+
+def poisson_test(df, alpha=0.05, precision=4):
+    dof = df.shape[0] - 1 - 1
+    chi2_stat = sum((df['f_i - e_i']) ** 2 / df['e_i'])
+    chi2_cv = stats.chi2.ppf(1 - alpha, df=dof)
+    flag = False  # cannot reject
+    if chi2_stat > chi2_cv:
+        flag = True
+
+    result = f"""======= Poisson Test =======
+chi2 statistic (observed value): {chi2_stat:.{precision}f}
+chi2 critical value: {chi2_cv:.{precision}f}
+Degree of freedom: {dof}
+
+Reject H_0 (does not follow a Poisson distribution) → {flag}
+"""
+    print(result)
