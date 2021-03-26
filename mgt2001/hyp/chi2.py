@@ -277,10 +277,14 @@ Significant Level (alpha) = {alpha:.{precision}f}
 
 def multinomial(freq_o, freq_e, alpha=0.05, precision=4):
     """
+    >>> return chi2_stat, chi2_cv, p_value
     Check RULE of FIVE before running the test
     >>> if np.sum(freq_e < 5) > 0:
     >>>    print("Rule of five is not met. ")
     """
+    # if np.sum(freq_e < 5) > 0:
+    #     print("Rule of five is not met.")
+    #     return
     stat, p_value = stats.chisquare(freq_o, freq_e)
     df = freq_o.shape[0]-1
     chi2_cv = stats.chi2.ppf(1 - alpha, df)
@@ -403,7 +407,7 @@ Reject H_0 (does not follow a Poisson distribution) → {flag}
     return chi2_stat, chi2_cv, dof
 
 
-def normal_test(srs, alpha=0.05, precision=4):
+def normal_test(srs=None, z_intervals=None, freq_o=None, alpha=0.05, precision=4):
     """
     pass in Series instead of DataFrame
     >>> return o_vs_e_freq_df, chi2_stat, chi2_cv, dof
@@ -411,53 +415,98 @@ def normal_test(srs, alpha=0.05, precision=4):
     Note:
     >>> z_value = stats.norm.ppf(area)
     """
-    snd = stats.norm
-    arr = np.array(srs)
-    o_vs_e_freq_df = pd.DataFrame(columns=['i', 'f_i', 'e_i', 'f_i - e_i'])
-    n = len(arr)
-    mu = arr.mean()
-    std = arr.std(ddof=1)
-    interval = n / 5
-    area = 1 / interval
-    acc_area = area
-    ctr = 0
-    while abs(acc_area - 1) > 0.00000001:
-        z_value = snd.ppf(acc_area)
-        x_value = z_value * std + mu
-        acc_area += area
-        f_i = sum(arr <= x_value)
-        arr = arr[arr > x_value]
+    if z_intervals is not None:
+        o_vs_e_freq_df = pd.DataFrame(columns=['i', 'f_i', 'e_i', 'f_i - e_i'])
 
-        ctr += 1
+        # intervals = [(-1), (-1, 0), (0, 1), (1)]
+        # freq_o = np.array([6, 27, 14, 3])
+        nobs = np.sum(freq_o)
+
+        snd = stats.norm
+
+        for i, interval in enumerate(z_intervals):
+            try:
+                if len(interval) > 1:
+                    z_value = snd.cdf(interval[1]) - snd.cdf(interval[0])
+            except:
+                if i == 0:
+                    z_value = snd.cdf(interval)
+                else:
+                    z_value = snd.sf(interval)
+
+            e_i = nobs * z_value
+            o_vs_e_freq_df = o_vs_e_freq_df.append(
+                {'i': interval, 'f_i': freq_o[i], 'e_i': e_i, 'f_i - e_i': freq_o[i] - e_i}, ignore_index=True)
+
+        if np.sum(o_vs_e_freq_df['e_i'] < 5) > 0:
+            print("Rule of five is not met. ")
+
+        chi2_stat = sum(o_vs_e_freq_df['f_i - e_i'] ** 2 / 5)
+        dof = o_vs_e_freq_df.shape[0] - 2 - 1
+        chi2_cv = stats.chi2.ppf(1 - alpha, df=dof)
+        flag = False
+        if chi2_stat > chi2_cv:
+            flag = True
+        result = f"""======= Goodness of Fit Test: Normal Distribution =======
+chi2 statistics = {chi2_stat:.{precision}f}
+chi2 critical value = {chi2_cv:.{precision}f}
+Degree of freedom = {dof}
+
+Reject H_0 (reject the assumption that the population is normally distributed) → {flag}
+    """
+        print(result)
+
+        return o_vs_e_freq_df, chi2_stat, chi2_cv, dof
+
+    elif srs is not None:
+        snd = stats.norm
+        arr = np.array(srs)
+        o_vs_e_freq_df = pd.DataFrame(columns=['i', 'f_i', 'e_i', 'f_i - e_i'])
+        n = len(arr)
+        mu = arr.mean()
+        std = arr.std(ddof=1)
+        interval = n / 5
+        area = 1 / interval
+        acc_area = area
+        ctr = 0
+        while abs(acc_area - 1) > 0.00000001:
+            z_value = snd.ppf(acc_area)
+            x_value = z_value * std + mu
+            acc_area += area
+            f_i = sum(arr <= x_value)
+            arr = arr[arr > x_value]
+
+            ctr += 1
+            o_vs_e_freq_df = o_vs_e_freq_df.append(
+                {'i': x_value, 'f_i': f_i, 'e_i': 5, 'f_i - e_i': f_i - 5}, ignore_index=True)
+
+        num_df = o_vs_e_freq_df.i
+        f_i = sum(arr > x_value)
+        x_value = f'> {x_value:.3f}'
         o_vs_e_freq_df = o_vs_e_freq_df.append(
             {'i': x_value, 'f_i': f_i, 'e_i': 5, 'f_i - e_i': f_i - 5}, ignore_index=True)
 
-    num_df = o_vs_e_freq_df.i
-    f_i = sum(arr > x_value)
-    x_value = f'> {x_value:.3f}'
-    o_vs_e_freq_df = o_vs_e_freq_df.append(
-        {'i': x_value, 'f_i': f_i, 'e_i': 5, 'f_i - e_i': f_i - 5}, ignore_index=True)
+        for i in range(1, ctr):
+            o_vs_e_freq_df.iat[i, 0] = f'{num_df[i - 1]:.3f} ~ {num_df[i]:.3f}'
+        o_vs_e_freq_df.iat[0, 0] = f'<= {o_vs_e_freq_df.i[0]:.3f}'
 
-    for i in range(1, ctr):
-        o_vs_e_freq_df.iat[i, 0] = f'{num_df[i - 1]:.3f} ~ {num_df[i]:.3f}'
-    o_vs_e_freq_df.iat[0, 0] = f'<= {o_vs_e_freq_df.i[0]:.3f}'
-
-    # test
-    chi2_stat = sum(o_vs_e_freq_df['f_i - e_i'] ** 2 / 5)
-    dof = o_vs_e_freq_df.shape[0] - 2 - 1
-    chi2_cv = stats.chi2.ppf(1 - alpha, df=dof)
-    flag = False
-    if chi2_stat > chi2_cv:
-        flag = True
-    result = f"""======= Goodness of Fit Test: Normal Distribution =======
+        # test
+        chi2_stat = sum(o_vs_e_freq_df['f_i - e_i'] ** 2 / 5)
+        dof = o_vs_e_freq_df.shape[0] - 2 - 1
+        chi2_cv = stats.chi2.ppf(1 - alpha, df=dof)
+        flag = False
+        if chi2_stat > chi2_cv:
+            flag = True
+        result = f"""======= Goodness of Fit Test: Normal Distribution =======
 chi2 statistics = {chi2_stat:.{precision}f}
 chi2 critical value = {chi2_cv:.{precision}f}
+Degree of freedom = {dof}
 
 μ = {mu:.{precision}f}
 σ = {std:.{precision}f}
 
 Reject H_0 (reject the assumption that the population is normally distributed with μ = {mu:.{precision}f} and σ = {std:.{precision}f}) → {flag}
-    """
-    print(result)
+        """
+        print(result)
 
-    return o_vs_e_freq_df, chi2_stat, chi2_cv, dof
+        return o_vs_e_freq_df, chi2_stat, chi2_cv, dof
