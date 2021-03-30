@@ -441,7 +441,8 @@ def normal_test(srs=None, z_intervals=None, freq_o=None, alpha=0.05, precision=4
         if np.sum(o_vs_e_freq_df['e_i'] < 5) > 0:
             print("Rule of five is not met. ")
 
-        chi2_stat = sum(o_vs_e_freq_df['f_i - e_i'] ** 2 / 5)
+        chi2_stat = sum(o_vs_e_freq_df['f_i - e_i']
+                        ** 2 / o_vs_e_freq_df.shape[0])
         dof = o_vs_e_freq_df.shape[0] - 2 - 1
         chi2_cv = stats.chi2.ppf(1 - alpha, df=dof)
         flag = False
@@ -491,7 +492,8 @@ Reject H_0 (reject the assumption that the population is normally distributed) â
         o_vs_e_freq_df.iat[0, 0] = f'<= {o_vs_e_freq_df.i[0]:.3f}'
 
         # test
-        chi2_stat = sum(o_vs_e_freq_df['f_i - e_i'] ** 2 / 5)
+        chi2_stat = sum(o_vs_e_freq_df['f_i - e_i']
+                        ** 2 / o_vs_e_freq_df.shape[0])
         dof = o_vs_e_freq_df.shape[0] - 2 - 1
         chi2_cv = stats.chi2.ppf(1 - alpha, df=dof)
         flag = False
