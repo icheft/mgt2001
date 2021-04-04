@@ -9,6 +9,7 @@ from . import chi2
 from . import p
 from . import ind
 from . import anova
+from . import non
 
 
 """
