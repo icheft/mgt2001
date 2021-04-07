@@ -149,6 +149,7 @@ Targeted Sign: {sign}
 n = {n}
 Sign counts = {T}
 
+z statistic = {z_stat:.{precision}f}
 p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
 Reject H_0 ({alternative}) → {flag}
     '''
