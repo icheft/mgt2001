@@ -18,6 +18,22 @@ def inter_p_value(p_value):
     return inter_p
 
 
+def grank(data):
+    if type(data) == np.ndarray or type(data) == list:
+        alldata = data.copy()
+        data = data.copy()
+    else:
+        alldata = data.values.copy()
+        data = data.values.copy()
+    alldata.sort()
+    tmp_df = pd.DataFrame({'value': alldata})
+    tmp_df['rank'] = tmp_df.index + 1
+    value_to_rank = tmp_df.groupby('value').mean().reset_index()
+    samp = pd.DataFrame({'value': data})
+    samp = pd.merge(samp, value_to_rank, how='left')
+    return samp['rank']
+
+
 def ranksum_z_test(df=None, to_compute='', alternative=None, precision=4, alpha=0.05):
     """
     df can only have two columns and df.shape[0] > 10
@@ -219,3 +235,128 @@ Reject H_0 ({alternative}) → {flag}
                    'sigma_T': sigma_T, 'z_stat': z_stat, 'p_value': p_value}
 
     return new_df, result_dict
+
+
+def kruskal_chi2_test(data=None, alpha=0.05, precision=4):
+    if type(data) == pd.DataFrame:
+        data = data.copy().to_numpy()
+        alldata = np.concatenate(data.copy())
+    else:
+        alldata = np.concatenate(data.copy())
+
+    k = data.shape[1]
+    alldata.sort()
+
+    tmp_df = pd.DataFrame(({'value': alldata}))
+    tmp_df['rank'] = tmp_df.index + 1  # rank
+    value_to_rank = tmp_df.groupby('value').mean().reset_index()
+    T = []
+    sample_rank_df = []
+    for i in range(k):
+
+        samp = pd.DataFrame(
+            {'value': data[:, i][~np.isnan(data[:, i])]})
+
+        samp = pd.merge(samp, value_to_rank)
+        sample_rank_df.append(samp)
+        T.append(samp['rank'].sum())
+
+    n = [len(data[:, i][~np.isnan(data[:, i])]) for i in range(k)]
+
+    # print(T)
+    # print(n)
+
+    rule_of_five_str = ""
+    if (np.sum(np.array(n) < 5) > 0):
+        rule_of_five_str += "!(At least one sample size is less than 5)"
+    else:
+        rule_of_five_str += "(All sample size >= 5)"
+
+    N = np.sum(n)
+
+    t_over_n = 0
+
+    for i in range(k):
+        t_over_n += T[i] ** 2 / n[i]
+
+    H = 12 / N / (N + 1) * t_over_n - 3 * (N + 1)
+    p_value = 1 - stats.chi2.cdf(H, k - 1)
+    chi2_stat = stats.chi2.ppf(1 - alpha, k - 1)
+
+    result_dict = {'H': H, 'p-value': p_value,
+                   'T': T, 'sample_rank_df': sample_rank_df}
+    flag = p_value < alpha
+
+    result = f'''======= Kruskal-Wallis Test with Chi-squared Test =======
+{rule_of_five_str}
+
+H statistic value (observed) = {H:.{precision}f}
+chi2 critical value = {chi2_stat:.{precision}f}
+p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
+Reject H_0 (Not all {k} population locations are the same) → {flag}
+    '''
+    print(result)
+    return result_dict
+
+
+def friedman_chi2_test(data=None, alpha=0.05, precision=4):
+    if type(data) == np.ndarray:
+        data = pd.DataFrame(data)
+
+    new_df = data.apply(grank, axis=1)
+    b, k = new_df.shape
+
+    rule_of_five_str = ""
+    if (b < 5 and k < 5):
+        rule_of_five_str += f"!(Number of blocks = {b} < 5 and number of populations = {k} < 5)"
+    else:
+        rule_of_five_str += f"(Number of blocks = {b} >= 5 or number of populations {k} >= 5)"
+
+    T = new_df.sum().to_numpy()
+
+    F_r = 12 / b / k / (k + 1) * np.sum(T ** 2) - 3 * b * (k + 1)
+    p_value = 1 - stats.chi2.cdf(F_r, k - 1)
+    chi2_stat = stats.chi2.ppf(1 - alpha, k - 1)
+
+    result_dict = {'F_r': F_r, 'p-value': p_value,
+                   'T': T, 'sample_ranked_df': new_df}
+    flag = p_value < alpha
+
+    result = f'''======= Friedman Test with Chi-squared Test =======
+{rule_of_five_str}
+
+F_r statistic value (observed) = {F_r:.{precision}f}
+chi2 critical value = {chi2_stat:.{precision}f}
+p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
+Reject H_0 (Not all {k} population locations are the same) → {flag}
+    '''
+    print(result)
+    return result_dict
+
+
+def pearson_test(data=None, alpha=0.05, precision=4):
+    cov_mat = np.cov(data.values, rowvar=False)
+    cor_mat = np.corrcoef(data.values, rowvar=False)
+    cov = cov_mat[0][1]
+    cor = cor_mat[0][1]
+
+    n = data.shape[0]
+    d_of_f = n - 2
+    t_c = stats.t.ppf(1 - alpha / 2, df=d_of_f)
+    t_stat = cor * (((n - 2) / (1 - cor ** 2)) ** 0.5)
+
+    flag = abs(t_stat) > t_c
+    result_dict = {'cov': cov, 't_stat': t_stat, 'cor': cor, 't_c': t_c}
+    results = f"""======= Pearson Correlation Coefficient =======
+Covariance: {cov:.{precision}f}
+Coefficient of Correlation: {cor:.{precision}f}
+
+t (Critical Value) = {t_c:.{precision}f}
+t (Observed Value) = {t_stat:.{precision}f}
+
+Reject H_0 (There are linear relationship between two variables) → {flag}
+"""
+
+    print(results)
+
+    return result_dict
