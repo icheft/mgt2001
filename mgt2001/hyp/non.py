@@ -238,6 +238,10 @@ Reject H_0 ({alternative}) → {flag}
 
 
 def kruskal_chi2_test(data=None, alpha=0.05, precision=4):
+    """
+    col = 要比較的 target
+    row = data for each target
+    """
     if type(data) == pd.DataFrame:
         data = data.copy().to_numpy()
         alldata = np.concatenate(data.copy())
@@ -300,6 +304,10 @@ Reject H_0 (Not all {k} population locations are the same) → {flag}
 
 
 def friedman_chi2_test(data=None, alpha=0.05, precision=4):
+    """
+    col = 要比較的 target
+    row = blocked data for each target
+    """
     if type(data) == np.ndarray:
         data = pd.DataFrame(data)
 
@@ -334,7 +342,11 @@ Reject H_0 (Not all {k} population locations are the same) → {flag}
     return result_dict
 
 
-def pearson_test(data=None, alpha=0.05, precision=4):
+def pearson_test(data=None, a=None, b=None, alpha=0.05, precision=4):
+    """
+    a, b 還不能傳入東西
+    Make sure that data is in the form of [a, b]
+    """
     cov_mat = np.cov(data.values, rowvar=False)
     cor_mat = np.corrcoef(data.values, rowvar=False)
     cov = cov_mat[0][1]
@@ -356,6 +368,58 @@ t (Observed Value) = {t_stat:.{precision}f}
 
 Reject H_0 (There are linear relationship between two variables) → {flag}
 """
+
+    print(results)
+
+    return result_dict
+
+
+def spearman_test(a=None, b=None, alpha=0.05, precision=4):
+    spearman_restult_cor, spearman_restult_p_value = stats.spearmanr(a, b)
+    # print(f'Correlation = {cor:.4f}, p-value={p_value:.4f}')
+    n = len(a)
+
+    rule_of_30_str = ''
+
+    results = f"""======= Spearman Rank Correlation Coefficient =======
+[scipy.stats.spearmanr]
+Coefficient of Correlation: {spearman_restult_cor:.{precision}f}
+p-value={spearman_restult_p_value:.{precision}f} ({inter_p_value(spearman_restult_p_value)})
+"""
+
+    if (n < 30):
+        rule_of_30_str += f"!(n = {n} < 30)"
+        flag = spearman_restult_p_value < alpha
+        results += f"""
+Reject H_0 (There are relationship between two variables) → {flag}
+        """
+        result_dict = {'spearman_result': [
+            spearman_restult_cor, spearman_restult_p_value]}
+    else:
+        rule_of_30_str += f"(n = {n} >= 30)"
+        flag = spearman_restult_p_value < alpha
+        results += f"""
+Reject H_0 (There are relationship between two variables) → {flag}
+        """
+        z_stat = spearman_restult_cor * ((n - 1) ** 0.5)
+        z_cv = stats.norm.ppf(1 - alpha/2)
+        p_value = stats.norm.sf(z_stat) * 2
+        if p_value > 1:
+            p_value = stats.norm.cdf(z_stat) * 2
+        flag = p_value < alpha
+        results += f"""
+[z test statistic]
+{rule_of_30_str}
+
+r_s: {spearman_restult_cor:.{precision}f} (using spearmanr's result)
+z stat (observed value) = {z_stat:.{precision}f}
+z (critical value) = {z_cv:.{precision}f}
+p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
+Reject H_0 (There are relationship between two variables) → {flag}
+        """
+
+        result_dict = {'spearman_result': [
+            spearman_restult_cor, spearman_restult_p_value], 'z_stat': z_stat, 'z_cv': z_cv, 'p-value': p_value}
 
     print(results)
 
