@@ -432,3 +432,299 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(
 
     if pf:
         return means, betas, xticks, yticks
+
+
+def _single_pop(url=None):
+    quit_signal = ['quit', 'q', 'Q', 'Quit', 'QUIT', 'exit']
+    print('Describe a single population:')
+    cmd = (input(f'''Data Type?
+1. Interval
+2. Nominal
+'''))
+    while(cmd not in quit_signal):
+        try:
+            cmd = int(cmd)
+        except:
+            pass
+        if cmd == 1:
+            cmd = (input(f'''Type of descriptive measurements?
+1. Central location
+2. Variability
+'''))
+            try:
+                cmd = int(cmd)
+            except:
+                pass
+            dic = {1: 't-test and estimator of mu',
+                   2: 'chi2-test and estimator of sigma2'}
+            print(dic[cmd])
+        elif cmd == 2:
+            cmd = (input(f'''Number of categories?
+1. Two
+2. Two or more
+'''))
+            try:
+                cmd = int(cmd)
+            except:
+                pass
+            dic = {1: 'z-test and estimator of p',
+                   2: 'chi2-goodness-of-fit test'}
+            print(dic[cmd])
+
+        break
+
+
+def _experimental_design(url=None):
+    quit_signal = ['quit', 'q', 'Q', 'Quit', 'QUIT', 'exit']
+    cmd = (input(f'''Experimental design?
+1. Independent samples
+2. Matched Pairs
+'''))
+    while(cmd not in quit_signal):
+        try:
+            cmd = int(cmd)
+        except:
+            pass
+        if cmd == 1:
+            cmd = (input(f'''Population distributions?
+1. Normal
+2. Nonnormal
+'''))
+            try:
+                cmd = int(cmd)
+            except:
+                pass
+            dic = {1: _variance(url=url), 2: 'Wilcoxon Rank Sum Test'}
+            if type(dic[cmd]) == str:
+                print(dic[cmd])
+        elif cmd == 2:
+            cmd = (input(f'''Distribution of differences?
+1. Normal
+2. Nonnormal
+'''))
+            try:
+                cmd = int(cmd)
+            except:
+                pass
+            dic = {1: 't-test and estimator of \mu_D',
+                   2: 'Wilcoxon Signed Rank Sum Test'}
+            print(dic[cmd])
+
+        break
+
+
+def _variance(url=None):
+    quit_signal = ['quit', 'q', 'Q', 'Quit', 'QUIT', 'exit']
+    cmd = (input(f'''Population variances?
+1. Equal
+2. Unequal
+'''))
+    while(cmd not in quit_signal):
+        try:
+            cmd = int(cmd)
+        except:
+            pass
+        dic = {1: 't-test and estimator of \mu_1 - \mu_2 (equal-variances)',
+               2: 't-test and estimator of \mu_1 - \mu_2 (unequal-variances)'}
+        print(dic[cmd])
+        break
+
+
+def _two_pop(url=None):
+    quit_signal = ['quit', 'q', 'Q', 'Quit', 'QUIT', 'exit']
+    cmd = (input(f'''Data Type?
+1. Interval
+2. Ordinal
+3. Nominal
+'''))
+    while(cmd not in quit_signal):
+        try:
+            cmd = int(cmd)
+        except:
+            pass
+        if cmd == 1:
+            cmd = (input(f'''Type of descriptive measurements?
+1. Central location
+2. Variability
+'''))
+            try:
+                cmd = int(cmd)
+            except:
+                pass
+            dic = {1: _experimental_design(
+                url=url), 2: 'chi2-test and estimator of sigma2'}
+            if type(dic[cmd]) == str:
+                print(dic[cmd])
+        elif cmd == 2:
+            cmd = (input(f'''Experimental Design?
+1. Independent samples
+2. Matched pairs
+'''))
+            try:
+                cmd = int(cmd)
+            except:
+                pass
+            dic = {1: 'Wilcoxon Rank Sum Test', 2: 'Sign Test'}
+            print(dic[cmd])
+        elif cmd == 3:
+            cmd = (input(f'''Number of categories?
+1. Two
+2. Two or more
+'''))
+            try:
+                cmd = int(cmd)
+            except:
+                pass
+            dic = {
+                1: f'z-test and estimator of p_1 - p_2 ({url}/MGT2002/Chap-13-Inference-about-Comparing-Two-Population/#python-code-and-interpretation_2)', 2: 'chi2-test of a contingency table'}
+            print(dic[cmd])
+
+        break
+
+
+def _pop_dist(url=None):
+    quit_signal = ['quit', 'q', 'Q', 'Quit', 'QUIT', 'exit']
+    cmd = (input(f'''Population distributions?
+1. Normal
+2. Nonnormal
+'''))
+    while(cmd not in quit_signal):
+        try:
+            cmd = int(cmd)
+        except:
+            pass
+        dic = {1: 'One-way and two-factor analysis of variance',
+               2: 'Kruskal-Wallis Test'}
+        print(dic[cmd])
+        break
+
+
+def _pop_dist_2(url=None):
+    quit_signal = ['quit', 'q', 'Q', 'Quit', 'QUIT', 'exit']
+    cmd = (input(f'''Population distributions?
+1. Normal
+2. Nonnormal
+'''))
+    while(cmd not in quit_signal):
+        try:
+            cmd = int(cmd)
+        except:
+            pass
+        dic = {
+            1: f'Randomized block analysis of variance ({url}/MGT2002/Chap-14-II-Analysis-of-Variance-ANOVA/#randomized-block-anova-test)', 2: 'Friedman Test'}
+        print(dic[cmd])
+        break
+
+
+def _two_or_more_pop(url=None):
+    quit_signal = ['quit', 'q', 'Q', 'Quit', 'QUIT', 'exit']
+    cmd = (input(f'''Data Type?
+1. Interval
+2. Ordinal
+3. Nominal
+'''))
+    while(cmd not in quit_signal):
+        try:
+            cmd = int(cmd)
+        except:
+            pass
+        if cmd == 1:
+            cmd = (input(f'''Experimental design?
+1. Independent samples
+2. Blocks
+'''))
+            try:
+                cmd = int(cmd)
+            except:
+                pass
+            dic = {1: _pop_dist(url=url), 2: _pop_dist_2(url=url)}
+            if type(dic[cmd]) == str:
+                print(dic[cmd])
+        elif cmd == 2:
+            cmd = (input(f'''Experimental Design?
+1. Independent samples
+2. Blocks
+'''))
+            try:
+                cmd = int(cmd)
+            except:
+                pass
+            dic = {1: 'Kruskal-Wallis Test', 2: 'Friedman Test'}
+            print(dic[cmd])
+        elif cmd == 3:
+            print('chi2-test of a contingency table')
+
+        break
+
+
+def _relationship(url=None):
+    quit_signal = ['quit', 'q', 'Q', 'Quit', 'QUIT', 'exit']
+    cmd = (input(f'''Data Type?
+1. Interval
+2. Ordinal
+3. Nominal
+'''))
+    while(cmd not in quit_signal):
+        try:
+            cmd = int(cmd)
+        except:
+            pass
+        if cmd == 1:
+            cmd = (input(f'''Population distributions?
+1. Error is normal or x and y bivariate normal
+2. x and y not bivariate normal
+'''))
+            try:
+                cmd = int(cmd)
+            except:
+                pass
+            dic = {1: 'Simple linear regression and correlation',
+                   2: 'Spearman rank correlation'}
+            if type(dic[cmd]) == str:
+                print(dic[cmd])
+        elif cmd == 2:
+            print('Spearman rank correlation')
+        elif cmd == 3:
+            print('chi2-test of a contingency table')
+
+        break
+
+
+def which(location='local'):
+    url = ''
+    if (location == 'local'):
+        url += 'http://127.0.0.1:8000'
+    else:
+        url = location
+    quit_signal = ['quit', 'q', 'Q', 'Quit', 'QUIT', 'exit']
+    cmd = input(f'''Declare objective:
+1. Describe a single population
+2. Comapre two populations
+3. Compare two or more populations
+4. Analyze relationships between two variables
+
+(type 'quit' to quit the program)
+''')
+    while(cmd not in quit_signal):
+        try:
+            cmd = int(cmd)
+        except:
+            pass
+        if cmd == 1:
+            _single_pop(url=url)
+        elif cmd == 2:
+            _two_pop(url=url)
+        elif cmd == 3:
+            _two_or_more_pop(url=url)
+        elif cmd == 4:
+            _relationship(url=url)
+
+        cmd = input(f'''=======
+Declare objective:
+1. Describe a single population
+2. Comapre two populations
+3. Compare two or more populations
+4. Analyze relationships between two variables
+
+(type 'quit' to quit the program)
+''')
