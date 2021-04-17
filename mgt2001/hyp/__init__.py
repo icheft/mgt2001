@@ -603,7 +603,7 @@ def _pop_dist(url=None):
             cmd = int(cmd)
         except:
             pass
-        dic = {1: 'One-way and two-factor analysis of variance',
+        dic = {1: f'One-way and two-factor analysis of variance ({url}/MGT2002/Chap-14-I-Analysis-of-Variance-ANOVA/#testing-for-the-equality-of-k-population-means | code: {url}/MGT2002/One-way-ANOVA-workflow/#one-way-anova-workflow)',
                2: 'Kruskal-Wallis Test'}
         print(dic[cmd])
         break
@@ -621,7 +621,7 @@ def _pop_dist_2(url=None):
         except:
             pass
         dic = {
-            1: f'Randomized block analysis of variance ({url}/MGT2002/Chap-14-II-Analysis-of-Variance-ANOVA/#randomized-block-anova-test)', 2: 'Friedman Test'}
+            1: f'Randomized block analysis of variance ({url}/MGT2002/Chap-14-II-Analysis-of-Variance-ANOVA/#randomized-block-anova-test | code: {url}/MGT2002/Two-way-ANOVA-Randomized-Block-workflow/#two-way-anova-randomized-block-workflow)', 2: 'Friedman Test'}
         print(dic[cmd])
         break
 
