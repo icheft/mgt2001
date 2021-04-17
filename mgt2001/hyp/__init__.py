@@ -434,6 +434,8 @@ def type2_plot(h0_mean, psigma, nsizes, alpha, ranges, option='right', figsize=(
         return means, betas, xticks, yticks
 
 
+# 2021-04-18
+
 def _single_pop(url=None):
     quit_signal = ['quit', 'q', 'Q', 'Quit', 'QUIT', 'exit']
     print('Describe a single population:')
@@ -494,9 +496,13 @@ def _experimental_design(url=None):
                 cmd = int(cmd)
             except:
                 pass
-            dic = {1: _variance(url=url), 2: 'Wilcoxon Rank Sum Test'}
-            if type(dic[cmd]) == str:
+            dic = {1: _variance, 2: 'Wilcoxon Rank Sum Test'}
+            if callable(dic[cmd]):
+                dic[cmd](url=url)
+            else:
                 print(dic[cmd])
+            # if type(dic[cmd]) == str:
+            #     print(dic[cmd])
         elif cmd == 2:
             cmd = (input(f'''Distribution of differences?
 1. Normal
@@ -524,8 +530,8 @@ def _variance(url=None):
             cmd = int(cmd)
         except:
             pass
-        dic = {1: 't-test and estimator of \mu_1 - \mu_2 (equal-variances)',
-               2: 't-test and estimator of \mu_1 - \mu_2 (unequal-variances)'}
+        dic = {1: f't-test and estimator of \mu_1 - \mu_2 (equal-variances) ({url}/MGT2002/Chap-13-Inference-about-Comparing-Two-Population/#python-code-and-interpretation)',
+               2: f't-test and estimator of \mu_1 - \mu_2 (unequal-variances) ({url}/MGT2002/Chap-13-Inference-about-Comparing-Two-Population/#python-code-and-interpretation)'}
         print(dic[cmd])
         break
 
@@ -551,10 +557,14 @@ def _two_pop(url=None):
                 cmd = int(cmd)
             except:
                 pass
-            dic = {1: _experimental_design(
-                url=url), 2: 'chi2-test and estimator of sigma2'}
-            if type(dic[cmd]) == str:
+            dic = {1: _experimental_design,
+                   2: 'chi2-test and estimator of sigma2'}
+            if callable(dic[cmd]):
+                dic[cmd](url=url)
+            else:
                 print(dic[cmd])
+            # if type(dic[cmd]) == str:
+            #     print(dic[cmd])
         elif cmd == 2:
             cmd = (input(f'''Experimental Design?
 1. Independent samples
@@ -637,9 +647,12 @@ def _two_or_more_pop(url=None):
                 cmd = int(cmd)
             except:
                 pass
-            dic = {1: _pop_dist(url=url), 2: _pop_dist_2(url=url)}
-            if type(dic[cmd]) == str:
+            dic = {1: _pop_dist, 2: _pop_dist_2}
+            if callable(dic[cmd]):
+                dic[cmd](url=url)
+            else:
                 print(dic[cmd])
+
         elif cmd == 2:
             cmd = (input(f'''Experimental Design?
 1. Independent samples
@@ -652,7 +665,8 @@ def _two_or_more_pop(url=None):
             dic = {1: 'Kruskal-Wallis Test', 2: 'Friedman Test'}
             print(dic[cmd])
         elif cmd == 3:
-            print('chi2-test of a contingency table')
+            print(
+                f'chi2-test of a contingency table ({url}/MGT2002/Chap-15-Chi-Squared-Tests/#python-code-for-contingency-test)')
 
         break
 
