@@ -470,7 +470,7 @@ def _single_pop(url=None):
             except:
                 pass
             dic = {1: 'z-test and estimator of p',
-                   2: 'chi2-goodness-of-fit test'}
+                   2: f'chi2-goodness-of-fit test (code: {url}/MGT2002/workflow/Chi-Squared-Tests-Workflow/#goodness-of-fit-test-a-multinomial-population)'}
             print(dic[cmd])
 
         break
@@ -496,7 +496,8 @@ def _experimental_design(url=None):
                 cmd = int(cmd)
             except:
                 pass
-            dic = {1: _variance, 2: 'Wilcoxon Rank Sum Test'}
+            dic = {
+                1: _variance, 2: f'Wilcoxon Rank Sum Test ({url}/MGT2002/Chap-19-Nonparametric-Methods/#python-code-for-wilcoxon-rank-sum-test | code: {url}/MGT2002/workflow/Nonparametric-Methods-Workflow/#wilcoxon-rank-sum-test)'}
             if callable(dic[cmd]):
                 dic[cmd](url=url)
             else:
@@ -512,8 +513,8 @@ def _experimental_design(url=None):
                 cmd = int(cmd)
             except:
                 pass
-            dic = {1: 't-test and estimator of \mu_D',
-                   2: 'Wilcoxon Signed Rank Sum Test'}
+            dic = {1: f't-test and estimator of \mu_D (code: {url}/MGT2002/workflow/Difference-Between-Two-Means/#matched-pair-experiment)',
+                   2: f'Wilcoxon Signed Rank Sum Test (code: {url}/MGT2002/workflow/Nonparametric-Methods-Workflow/#wilcoxon-signed-rank-sum-test)'}
             print(dic[cmd])
 
         break
@@ -530,8 +531,8 @@ def _variance(url=None):
             cmd = int(cmd)
         except:
             pass
-        dic = {1: f't-test and estimator of \mu_1 - \mu_2 (equal-variances) ({url}/MGT2002/Chap-13-Inference-about-Comparing-Two-Population/#python-code-and-interpretation)',
-               2: f't-test and estimator of \mu_1 - \mu_2 (unequal-variances) ({url}/MGT2002/Chap-13-Inference-about-Comparing-Two-Population/#python-code-and-interpretation)'}
+        dic = {1: f't-test and estimator of \mu_1 - \mu_2 (equal-variances) ({url}/MGT2002/Chap-13-Inference-about-Comparing-Two-Population/#python-code-and-interpretation) \n code: {url}/MGT2002/workflow/Difference-Between-Two-Means/#independent-samples',
+               2: f't-test and estimator of \mu_1 - \mu_2 (unequal-variances) ({url}/MGT2002/Chap-13-Inference-about-Comparing-Two-Population/#python-code-and-interpretation) \n code: {url}/MGT2002/workflow/Difference-Between-Two-Means/#independent-samples'}
         print(dic[cmd])
         break
 
@@ -574,7 +575,8 @@ def _two_pop(url=None):
                 cmd = int(cmd)
             except:
                 pass
-            dic = {1: 'Wilcoxon Rank Sum Test', 2: 'Sign Test'}
+            dic = {
+                1: f'Wilcoxon Rank Sum Test ({url}/MGT2002/Chap-19-Nonparametric-Methods/#python-code-for-wilcoxon-rank-sum-test | code: {url}/MGT2002/workflow/Nonparametric-Methods-Workflow/#wilcoxon-rank-sum-test)', 2: f'Sign Test (code: {url}/MGT2002/workflow/Nonparametric-Methods-Workflow/#sign-test)'}
             print(dic[cmd])
         elif cmd == 3:
             cmd = (input(f'''Number of categories?
@@ -586,7 +588,7 @@ def _two_pop(url=None):
             except:
                 pass
             dic = {
-                1: f'z-test and estimator of p_1 - p_2 ({url}/MGT2002/Chap-13-Inference-about-Comparing-Two-Population/#python-code-and-interpretation_2)', 2: 'chi2-test of a contingency table'}
+                1: f'z-test and estimator of p_1 - p_2 ({url}/MGT2002/Chap-13-Inference-about-Comparing-Two-Population/#python-code-and-interpretation_2) \n code: {url}/MGT2002/workflow/Difference-Between-Two-Means/#the-difference-between-two-population-proportions', 2: f'chi2-test of a contingency table ({url}/MGT2002/Chap-15-Chi-Squared-Tests/#python-code-for-contingency-test | code: {url}/MGT2002/workflow/Chi-Squared-Tests-Workflow/#tests-of-independence-contingency-table)'}
             print(dic[cmd])
 
         break
@@ -603,8 +605,8 @@ def _pop_dist(url=None):
             cmd = int(cmd)
         except:
             pass
-        dic = {1: f'One-way and two-factor analysis of variance ({url}/MGT2002/Chap-14-I-Analysis-of-Variance-ANOVA/#testing-for-the-equality-of-k-population-means | code: {url}/MGT2002/One-way-ANOVA-workflow/#one-way-anova-workflow)',
-               2: 'Kruskal-Wallis Test'}
+        dic = {1: f'One-way and two-factor analysis of variance \nOne-way: {url}/MGT2002/Chap-14-I-Analysis-of-Variance-ANOVA/#testing-for-the-equality-of-k-population-means | code: {url}/MGT2002/workflow/One-way-ANOVA-workflow/#one-way-anova-workflow \nTwo-factor: | code: {url}/MGT2002/workflow/Two-way-ANOVA-workflow/#two-way-anova-two-factors-workflow',
+               2: f'Kruskal-Wallis Test (code: {url}/MGT2002/workflow/Nonparametric-Methods-Workflow/#kruskal-wallis-test)'}
         print(dic[cmd])
         break
 
@@ -621,7 +623,7 @@ def _pop_dist_2(url=None):
         except:
             pass
         dic = {
-            1: f'Randomized block analysis of variance ({url}/MGT2002/Chap-14-II-Analysis-of-Variance-ANOVA/#randomized-block-anova-test | code: {url}/MGT2002/Two-way-ANOVA-Randomized-Block-workflow/#two-way-anova-randomized-block-workflow)', 2: 'Friedman Test'}
+            1: f'Randomized block analysis of variance ({url}/MGT2002/Chap-14-II-Analysis-of-Variance-ANOVA/#randomized-block-anova-test | code: {url}/MGT2002/workflow/Two-way-ANOVA-Randomized-Block-workflow/#two-way-anova-randomized-block-workflow)', 2: f'Friedman Test (code: {url}/MGT2002/workflow/Nonparametric-Methods-Workflow/#friedman-test)'}
         print(dic[cmd])
         break
 
@@ -662,11 +664,12 @@ def _two_or_more_pop(url=None):
                 cmd = int(cmd)
             except:
                 pass
-            dic = {1: 'Kruskal-Wallis Test', 2: 'Friedman Test'}
+            dic = {
+                1: f'Kruskal-Wallis Test (code: {url}/MGT2002/workflow/Nonparametric-Methods-Workflow/#kruskal-wallis-test)', 2: f'Friedman Test (code: {url}/MGT2002/workflow/Nonparametric-Methods-Workflow/#friedman-test)'}
             print(dic[cmd])
         elif cmd == 3:
             print(
-                f'chi2-test of a contingency table ({url}/MGT2002/Chap-15-Chi-Squared-Tests/#python-code-for-contingency-test)')
+                f'chi2-test of a contingency table ({url}/MGT2002/Chap-15-Chi-Squared-Tests/#python-code-for-contingency-test | code: {url}/MGT2002/workflow/Chi-Squared-Tests-Workflow/#tests-of-independence-contingency-table)')
 
         break
 
@@ -692,14 +695,16 @@ def _relationship(url=None):
                 cmd = int(cmd)
             except:
                 pass
-            dic = {1: 'Simple linear regression and correlation',
-                   2: 'Spearman rank correlation'}
+            dic = {1: f'Simple linear regression and correlation (code: {url}/MGT2002/workflow/Nonparametric-Methods-Workflow/#pearson-correlation-coefficient)',
+                   2: f'Spearman rank correlation (code: {url}/MGT2002/workflow/Nonparametric-Methods-Workflow/#spearman-rank-correlation-coefficient)'}
             if type(dic[cmd]) == str:
                 print(dic[cmd])
         elif cmd == 2:
-            print('Spearman rank correlation')
+            print(
+                f'Spearman rank correlation (code: {url}/MGT2002/workflow/Nonparametric-Methods-Workflow/#spearman-rank-correlation-coefficient)')
         elif cmd == 3:
-            print('chi2-test of a contingency table')
+            print(
+                f'chi2-test of a contingency table ({url}/MGT2002/Chap-15-Chi-Squared-Tests/#python-code-for-contingency-test | code: {url}/MGT2002/workflow/Chi-Squared-Tests-Workflow/#tests-of-independence-contingency-table)')
 
         break
 
