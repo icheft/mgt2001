@@ -90,8 +90,14 @@ def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.
     if plot:
         plt.legend()
         plt.title(kwargs['title'])
-        plt.xlabel(Independence)
-        plt.ylabel(Dependence)
+        if 'xlabel' in kwargs:
+            plt.xlabel(kwargs['xlabel'])
+        else:
+            plt.xlabel(Independence)
+        if 'ylabel' in kwargs:
+            plt.ylabel(kwargs['ylabel'])
+        else:
+            plt.ylabel(Dependence)
         plt.show()
     else:
         plt.close(fig)
