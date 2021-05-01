@@ -74,6 +74,9 @@ p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
 
 
 def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.05, precision=4, show_summary=True, plot=False, slope_option='two-tail', beta1=0, coeff_option='two-tail', kwargs={'x': 0.02, 'y': 0.00, 'title': 'Scatter Plot'}):
+    """
+    df_result = smf.ols(f'{Dependence}~ {Independence}', data=df).fit()
+    """
     slope, intercept, r_value, p_value, std_err_sb1 = stats.linregress(
         df[Independence], df[Dependence])
     flag = p_value < alpha
@@ -112,6 +115,8 @@ def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.
     s_flag = s_p_value < alpha
     t_t_value, t_t_critical, t_p_value, t_option = c_of_c_test(
         r_value, df_result.nobs, alpha=alpha, precision=precision, show=False, option=coeff_option)
+    if t_option == 'Two-Tail Test':
+        t_p_value = p_value
 
     ci_b1 = df_result.conf_int(alpha)[1:].values[0]
     result_dict['ci_b1'] = ci_b1
@@ -142,7 +147,7 @@ Reject H_0 (Has some kind of relationship between two variables) → {s_flag}
 t (observed value): {t_t_value:.{precision}f}
 t (critical value): {t_t_critical:.{precision}f}
 r: {r_value:.{precision}f}
-p-value: {p_value:.{precision}f} ({inter_p_value(p_value)})
+p-value: {t_p_value:.{precision}f} ({inter_p_value(t_p_value)})
 Reject H_0 (Has Linear Relationship) → {flag}"""
     print(results)
     result_dict['description'] = results
