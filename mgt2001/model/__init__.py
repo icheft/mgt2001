@@ -145,6 +145,6 @@ r: {r_value:.{precision}f}
 p-value: {p_value:.{precision}f} ({inter_p_value(p_value)})
 Reject H_0 (Has Linear Relationship) → {flag}"""
     print(results)
-    result_dict['result'] = results
+    result_dict['description'] = results
 
     return result_dict
