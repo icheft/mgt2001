@@ -9,7 +9,7 @@ import statsmodels.api as sm
 import statsmodels.stats.api as sms
 import statsmodels.formula.api as smf
 
-from .. import add_margin
+from mgt2001 import add_margin
 
 
 def inter_p_value(p_value):
