@@ -9,7 +9,17 @@ import statsmodels.api as sm
 import statsmodels.stats.api as sms
 import statsmodels.formula.api as smf
 
-from . import add_margin
+
+def add_margin(ax, x=0.05, y=0.05):
+
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+
+    xmargin = (xlim[1]-xlim[0])*x
+    ymargin = (ylim[1]-ylim[0])*y
+
+    ax.set_xlim(xlim[0]-xmargin, xlim[1]+xmargin)
+    ax.set_ylim(ylim[0]-ymargin, ylim[1]+ymargin)
 
 
 def inter_p_value(p_value):
