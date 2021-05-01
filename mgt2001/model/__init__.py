@@ -91,6 +91,8 @@ def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.
         plt.xlabel(Independence)
         plt.ylabel(Dependence)
         plt.show()
+    else:
+        plt.close(fig)
 
     df_result = smf.ols(f'{Dependence}~ {Independence}', data=df).fit()
     result_dict['result'] = df_result
@@ -120,12 +122,12 @@ Estimated model: y = {intercept:.{precision}f} + {slope:.{precision}f} x
 **** t-Test of Slope <{s_option}> ****
 t (observed value): {s_t_value:.{precision}f}
 t (critical value): {s_t_critical:.{precision}f}
+b1 (slope): {slope:.{precision}f}
 p-value: {s_p_value:.{precision}f} ({inter_p_value(s_p_value)})
 
 Reject H_0 (Has some kind of relationship between two variables) → {s_flag}
 
 {(1-alpha) * 100}% confidence interval = [{ci_b1[0]:.4f}, {ci_b1[1]:.4f}]
-
 
 **** t-Test of Correlation Coefficient <{t_option}> ****
 t (observed value): {t_t_value:.{precision}f}
