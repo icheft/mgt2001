@@ -77,7 +77,8 @@ def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.
     slope, intercept, r_value, p_value, std_err_sb1 = stats.linregress(
         df[Independence], df[Dependence])
     flag = p_value < alpha
-    result_dict = {}
+    result_dict = {'slope': slope, 'intercept': intercept,
+                   'r_value': r_value, 'p_value': p_value}
     fig, ax = plt.subplots()
 
     ax = sns.regplot(x=Independence, y=Dependence, data=df, ci=None, scatter_kws={'color': 'dodgerblue'}, line_kws={
