@@ -73,7 +73,7 @@ p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
     return t_value, t_critical, p_value, option
 
 
-def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.05, precision=4, plot=False, slope_option='two-tail', beta1=0, coeff_option='two-tail', kwargs={'x': 0.02, 'y': 0.00, 'title': 'Scatter Plot'}):
+def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.05, precision=4, show_summary=True, plot=False, slope_option='two-tail', beta1=0, coeff_option='two-tail', kwargs={'x': 0.02, 'y': 0.00, 'title': 'Scatter Plot'}):
     slope, intercept, r_value, p_value, std_err_sb1 = stats.linregress(
         df[Independence], df[Dependence])
     flag = p_value < alpha
@@ -109,8 +109,9 @@ def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.
     ci_b1 = df_result.conf_int(alpha)[1:].values[0]
     result_dict['ci_b1'] = ci_b1
 
-    print(df_result.summary())
-    print()
+    if show_summary:
+        print(df_result.summary())
+        print()
     results = f"""======= Simple Linear Regression Results =======
 Dep. Variable: {Dependence}
 No. of Observations: {int(df_result.nobs)}
