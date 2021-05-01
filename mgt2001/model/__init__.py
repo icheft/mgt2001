@@ -110,8 +110,8 @@ def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.
     result_dict['ci_b1'] = ci_b1
 
     print(df_result.summary())
-
-    results = f""" ======= Simple Linear Regression Results =======
+    print()
+    results = f"""======= Simple Linear Regression Results =======
 Dep. Variable: {Dependence}
 No. of Observations: {int(df_result.nobs)}
 Standard Error: {s_e:.{precision}f}
@@ -135,8 +135,8 @@ t (observed value): {t_t_value:.{precision}f}
 t (critical value): {t_t_critical:.{precision}f}
 r: {r_value:.{precision}f}
 p-value: {p_value:.{precision}f} ({inter_p_value(p_value)})
-Reject H_0 (Has Linear Relationship) → {flag}
-"""
+Reject H_0 (Has Linear Relationship) → {flag}"""
     print(results)
+    result_dict['result'] = results
 
     return result_dict
