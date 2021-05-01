@@ -14,6 +14,7 @@ from . import notes
 from . import prob
 from . import samp  # sampling
 from . import hyp  # hypothesis
+from . import model  # modeling
 # from . import t  # hypothesis using t instead of z
 
 from ._version import __version__
