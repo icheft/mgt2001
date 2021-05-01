@@ -84,6 +84,7 @@ def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.
         'color': '#ffaa77', 'label': f"y = {intercept:.4f} + {slope:.4f} x"})
 
     add_margin(ax, x=kwargs['x'], y=kwargs['y'])  # Call this after tsplot
+    result_dict['fig'] = fig
     result_dict['ax'] = ax
     if plot:
         plt.legend()
