@@ -106,7 +106,7 @@ def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.
     ci_b1 = df_result.conf_int(alpha)[1:].values[0]
     result_dict['ci_b1'] = ci_b1
 
-    print(df_result.summary)
+    print(df_result.summary())
 
     results = f""" ======= Simple Linear Regression Results =======
 Dep. Variable: {Dependence}
