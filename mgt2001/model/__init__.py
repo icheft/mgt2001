@@ -9,6 +9,8 @@ import statsmodels.api as sm
 import statsmodels.stats.api as sms
 import statsmodels.formula.api as smf
 
+_runs_test_table = pd.read_csv('r_table.csv', index_col=0)
+
 
 def add_margin(ax, x=0.05, y=0.05):
 
