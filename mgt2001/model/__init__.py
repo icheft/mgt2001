@@ -100,7 +100,7 @@ p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
     return t_value, t_critical, p_value, option
 
 
-def SimpleLinearRegressionPrediction(Independence=None, Dependence=None, df=None, x=None, alpha=0.05, plot=True, kwargs={'title': 'Two Types of Intervals'}):
+def SimpleLinearRegressionPrediction(Independence=None, Dependence=None, df=None, x=None, alpha=0.05, plot=True, kwargs={'title': 'Two Types of Intervals', 'xlabel': 'Independent Variable', 'ylabel': 'Dependent Variable'}):
     """
 
     """
@@ -147,7 +147,7 @@ Prediction interval (confidence interval) for Exact Value: [{lower_bound2:.4f}, 
         x = df_sorted[Independence].values
         y = df_sorted[Dependence].values
         fig, ax = plt.subplots()
-        st, data, ss2 = sso.summary_table(df_res, alpha=alpha)
+        st, data, ss3 = sso.summary_table(df_res, alpha=alpha)
         fittedvalues = data[:, 2]
         predict_mean_se = data[:, 3]
         predict_mean_ci_low, predict_mean_ci_upp = data[:, 4:6].T
@@ -160,8 +160,17 @@ Prediction interval (confidence interval) for Exact Value: [{lower_bound2:.4f}, 
         plt.plot(x, predict_ci_low, 'b--', lw=0.4,
                  label='Prediction Interval')
         plt.plot(x, predict_ci_upp, 'b--', lw=0.4)
+        circle_rad = 12
+        ax.plot((x1), (y_head), 'o', color='gold',
+                label=f'$(x, \hat y)$ = ({x1}, {y_head:.4f})')
+        ax.plot((x1), (y_head), 'o', ms=circle_rad *
+                1.2, mec='gold', mfc='none', mew=2)
         plt.title(kwargs['title'])
+        plt.xlabel(kwargs['xlabel'])
+        plt.ylabel(kwargs['ylabel'])
         plt.legend()
+        ax.legend(loc='center left', bbox_to_anchor=(
+            1, 0.5), fancybox=True, shadow=True)
         CI_PI['fig'] = fig
         CI_PI['ax'] = ax
         if plot:
@@ -173,7 +182,7 @@ Prediction interval (confidence interval) for Exact Value: [{lower_bound2:.4f}, 
     return CI_PI
 
 
-def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, outlier=True, influencial=True):
+def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, outlier=True, influential=True):
     df_res = smf.ols(f'{Dependence}~ {Independence}', data=df).fit()
     simple_table, data, ss3 = sso.summary_table(df_res, alpha=0.05)
     std_resid = data[:, 10]
