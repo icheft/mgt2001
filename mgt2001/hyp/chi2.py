@@ -407,7 +407,7 @@ Reject H_0 (does not follow a Poisson distribution) â†’ {flag}
     return chi2_stat, chi2_cv, dof
 
 
-def normal_test(srs=None, z_intervals=None, freq_o=None, alpha=0.05, precision=4):
+def normal_test(srs=None, z_intervals=None, freq_o=None, interval=None, alpha=0.05, precision=4):
     """
     pass in Series instead of DataFrame
     >>> return o_vs_e_freq_df, chi2_stat, chi2_cv, dof
@@ -466,11 +466,22 @@ Reject H_0 (reject the assumption that the population is normally distributed) â
         n = len(arr)
         mu = arr.mean()
         std = arr.std(ddof=1)
-        interval = n / 5
-        area = 1 / interval
-        acc_area = area
-        ctr = 0
+        if interval == None:
+            interval = n / 5
+            exp = 5
+            area = 1 / interval
+            acc_area = area
+            ctr = 0
+        else:
+            area = 1 / interval
+            acc_area = area
+            ctr = 0
+            exp = area * n
+        if exp < 5:
+            print("Rule of five is not met.")
+
         while abs(acc_area - 1) > 0.00000001:
+            #             print(acc_area)
             z_value = snd.ppf(acc_area)
             x_value = z_value * std + mu
             acc_area += area
@@ -479,13 +490,13 @@ Reject H_0 (reject the assumption that the population is normally distributed) â
 
             ctr += 1
             o_vs_e_freq_df = o_vs_e_freq_df.append(
-                {'i': x_value, 'f_i': f_i, 'e_i': 5, 'f_i - e_i': f_i - 5}, ignore_index=True)
+                {'i': x_value, 'f_i': f_i, 'e_i': exp, 'f_i - e_i': f_i - exp}, ignore_index=True)
 
         num_df = o_vs_e_freq_df.i
         f_i = sum(arr > x_value)
         x_value = f'> {x_value:.3f}'
         o_vs_e_freq_df = o_vs_e_freq_df.append(
-            {'i': x_value, 'f_i': f_i, 'e_i': 5, 'f_i - e_i': f_i - 5}, ignore_index=True)
+            {'i': x_value, 'f_i': f_i, 'e_i': exp, 'f_i - e_i': f_i - exp}, ignore_index=True)
 
         for i in range(1, ctr):
             o_vs_e_freq_df.iat[i, 0] = f'{num_df[i - 1]:.3f} ~ {num_df[i]:.3f}'

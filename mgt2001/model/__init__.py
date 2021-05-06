@@ -8,6 +8,7 @@ import scipy.stats as stats
 from scipy.stats import norm
 import statsmodels.api as sm
 import statsmodels.stats.api as sms
+import statsmodels.stats.outliers_influence as sso
 import statsmodels.formula.api as smf
 
 _raw_r_table = StringIO(""",5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
@@ -62,7 +63,9 @@ def inter_p_value(p_value):
 def c_of_c_test(r, n, beta1=0, alpha=.05, precision=4, show=True, option='two-tail', **kwargs):
     """
     two-tail, right, left
-    kwargs needs to contain b1 and std_err if used
+    kwargs needs to contain b1 and std_err if used: 
+    >>> if beta1 != 0:
+    >>>    t_value = (kwargs['b1'] - beta1) / kwargs['std_err']
     """
     opt = option.lower()[0]
     t_value = r * ((n-2)/(1 - r**2)) ** 0.5
@@ -97,7 +100,217 @@ p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
     return t_value, t_critical, p_value, option
 
 
-def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.05, precision=4, show_summary=True, plot=False, slope_option='two-tail', beta1=0, coeff_option='two-tail', kwargs={'x': 0.02, 'y': 0.00, 'title': 'Scatter Plot'}):
+def SimpleLinearRegressionPrediction(Independence=None, Dependence=None, df=None, x=None, alpha=0.05, plot=True, kwargs={'title': 'Two Types of Intervals'}):
+    """
+
+    """
+    x1 = x
+    if type(Independence) == str:
+        x, y = df[Independence], df[Dependence]
+    else:
+        x, y = Independence, Dependence
+    x_new = np.array([1, x1])
+    X2 = sm.add_constant(x)
+    olsmod = sm.OLS(y, X2)
+    result_reg = olsmod.fit()
+    y_head = np.dot(result_reg.params, x_new)
+    (t_minus, t_plus) = stats.t.interval(
+        alpha=(1.0 - alpha), df=result_reg.df_resid)
+    cov_mat1 = np.cov(y, x)
+    x_bar = x.mean()
+    core1 = (1 / result_reg.nobs +
+             (x1 - x_bar) ** 2 / (result_reg.nobs - 1) / cov_mat1[1, 1]) ** 0.5
+    core2 = (1 + 1 / result_reg.nobs +
+             (x1 - x_bar) ** 2 / (result_reg.nobs - 1) / cov_mat1[1, 1]) ** 0.5
+    lower_bound = y_head + t_minus * (result_reg.mse_resid ** 0.5) * core1
+    upper_bound = y_head + t_plus * (result_reg.mse_resid ** 0.5) * core1
+    half_interval = t_plus * (result_reg.mse_resid ** 0.5) * core1
+    lower_bound2 = y_head + t_minus * (result_reg.mse_resid ** 0.5) * core2
+    upper_bound2 = y_head + t_plus * (result_reg.mse_resid ** 0.5) * core2
+    half_interval2 = t_plus * (result_reg.mse_resid ** 0.5) * core2
+    des = f"""======= Making Prediction =======
+Make CI and PI predictions at mean of x = {x1}
+y_head = {y_head}
+
+Confidence interval for mean: [{lower_bound:.4f}, {upper_bound:.4f}]
+    or {y_head:.4f}  ± {half_interval:.4f}
+Prediction interval (confidence interval) for Exact Value: [{lower_bound2:.4f}, {upper_bound2:.4f}]
+    or {y_head:.4f}  ± {half_interval2:.4f}
+        """
+
+    print(des)
+    CI_PI = {'CI': [lower_bound, upper_bound],
+             'PI': [lower_bound2, upper_bound2]}
+    try:
+        df_sorted = df.sort_values([Independence])
+        df_res = smf.ols(f'{Dependence}~ {Independence}', data=df_sorted).fit()
+        x = df_sorted[Independence].values
+        y = df_sorted[Dependence].values
+        fig, ax = plt.subplots()
+        st, data, ss2 = sso.summary_table(df_res, alpha=alpha)
+        fittedvalues = data[:, 2]
+        predict_mean_se = data[:, 3]
+        predict_mean_ci_low, predict_mean_ci_upp = data[:, 4:6].T
+        predict_ci_low, predict_ci_upp = data[:, 6:8].T
+        plt.plot(x, y, 'o', color='gray')
+        plt.plot(x, fittedvalues, 'g-', lw=0.5, label='Model')
+        plt.plot(x, predict_mean_ci_low, 'r-',
+                 lw=0.4, label='Confidence Interval')
+        plt.plot(x, predict_mean_ci_upp, 'r-', lw=0.4)
+        plt.plot(x, predict_ci_low, 'b--', lw=0.4,
+                 label='Prediction Interval')
+        plt.plot(x, predict_ci_upp, 'b--', lw=0.4)
+        plt.title(kwargs['title'])
+        plt.legend()
+        CI_PI['fig'] = fig
+        CI_PI['ax'] = ax
+        if plot:
+            plt.show()
+        else:
+            plt.close(fig)
+    except:
+        print('Indepent variable (x) and Dependent variable (y) should be passed in as "strings". Additional DataFrame is also required.')
+    return CI_PI
+
+
+def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, outlier=True, influencial=True):
+    df_res = smf.ols(f'{Dependence}~ {Independence}', data=df).fit()
+    simple_table, data, ss3 = sso.summary_table(df_res, alpha=0.05)
+    std_resid = data[:, 10]
+    return_dict = {}
+    if outlier:
+        df_w_std_resid = df.copy().reset_index().rename(
+            columns={'index': 'ID'})
+        df_w_std_resid['ID'] += 1
+        df_w_std_resid['Std. Resid'] = std_resid
+        filter = (df_w_std_resid['Std. Resid'] < -
+                  2) | (df_w_std_resid['Std. Resid'] > 2)
+        df_w_std_resid = df_w_std_resid[filter]
+        # display(df_w_std_resid)
+        return_dict['df_w_std_resid'] = df_w_std_resid
+
+        y_pre = data[:, 2]  # x
+
+        fig, ax = plt.subplots()
+
+        plt.plot(y_pre, std_resid, 'o', color='gray')
+        plt.axhline(y=0, color='blue')
+        plt.axhline(y=2, color='red')
+        plt.axhline(y=-2, color='red')
+
+        circle_rad = 12
+        for i in df_w_std_resid.index:
+            x_id = i
+            y_id = data[x_id, 2]
+            sr_id = data[x_id, 10]
+
+            ax.plot((y_id), (sr_id), 'o',
+                    ms=circle_rad * 1.5, mec='violet', mfc='none', mew=2)
+
+        plt.title('Standardized Residual Plot - Outliers in Violet Circle')
+        plt.xlabel('Predicted Dependent Variable')
+        plt.ylabel('Standardized Residual')
+
+        return_dict['outlier-fig'] = fig
+        return_dict['outlier-ax'] = ax
+
+        plt.show()
+
+    if influencial:
+        df_w_h = df.copy().reset_index().rename(columns={'index': 'ID'})
+        x_data = df[Independence].values
+        y_data = df[Dependence].values
+        cov_mat1 = np.cov(y_data, x_data)
+        x_data_bar = x_data.mean()
+        nobs = len(x_data)
+        h_val = 1 / nobs + (x_data - x_data_bar) ** 2 / \
+            (nobs - 1) / cov_mat1[1, 1]
+        df_w_h['h (leverage)'] = h_val
+        filter = (df_w_h['h (leverage)'] > 6 / nobs)
+        df_w_h = df_w_h[filter]
+        return_dict['df_w_h'] = df_w_h
+
+        y_pre = data[:, 2]  # x
+
+        fig, ax = plt.subplots()
+
+        plt.plot(y_pre, std_resid, 'o', color='gray')
+        plt.axhline(y=0, color='blue')
+        plt.axhline(y=2, color='red')
+        plt.axhline(y=-2, color='red')
+
+        # cir = plt.Circle((y_id, sr_id), 0.2, color='y',fill=False)
+        circle_rad = 12
+
+        for i in df_w_h.index:
+            x_id = i
+            y_id = data[x_id, 2]
+            sr_id = data[x_id, 10]
+        #     x_id, y_id, sr_id
+
+            ax.plot((y_id), (sr_id), 'o',
+                    ms=circle_rad * 1.5, mec='springgreen', mfc='none', mew=2)
+        # ax.set_aspect('equal', adjustable='datalim')
+        # ax.add_patch(cir)
+
+        plt.title(
+            'Standardized Residual Plot - Influential Observations in Spring Green')
+        plt.xlabel(
+            'Predicted Dependent Variable')
+        plt.ylabel('Standardized Residual')
+        # plt.legend()
+        return_dict['inf-fig'] = fig
+        return_dict['inf-ax'] = ax
+        plt.show()
+
+    # Scatter Plot with Two Variables and Fixed Margins (Seaborn included)
+    fig, ax = plt.subplots()
+
+    slope, intercept, r_value, p_value, std_err = stats.linregress(
+        df[Independence], df[Dependence])  # order matters
+
+    ax = sns.regplot(x=Independence, y=Dependence, data=df, ci=None, scatter_kws={'color': 'dodgerblue'}, line_kws={
+                     'color': '#ffaa77', 'label': f"y = {intercept:.4f} + {slope:.4f} x"})
+
+    circle_rad = 12
+
+    try:
+        for i in df_w_std_resid.index:
+            x_id = i
+            y_id = data[x_id, 1]
+            x_value = df[Independence][x_id]
+
+            ax.plot((x_value), (y_id), 'o',
+                    ms=circle_rad * 1.5, mec='violet', mfc='none', mew=2)
+    except:
+        pass
+    try:
+        for i in df_w_h.index:
+            x_id = i
+            y_id = data[x_id, 1]
+            x_value = df[Independence][x_id]
+
+            ax.plot((x_value), (y_id), 'o',
+                    ms=circle_rad * 1.5, mec='springgreen', mfc='none', mew=2)
+    except:
+        pass
+
+    plt.legend()
+
+    plt.title('Scatter Plot')
+    plt.xlabel(Independence)
+    plt.ylabel(Dependence)
+
+    add_margin(ax, x=0.02, y=0.00)  # Call this after tsplot
+
+    return_dict['all-fig'] = fig
+    return_dict['all-ax'] = ax
+    plt.show()
+
+    return return_dict
+
+
+def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.05, precision=4, show_summary=True, plot=False, test=True, slope_option='two-tail', beta1=0, coeff_option='two-tail', kwargs={'x': 0.02, 'y': 0.00, 'title': 'Scatter Plot'}):
     """
     df_result = smf.ols(f'{Dependence}~ {Independence}', data=df).fit()
     """
@@ -155,8 +368,10 @@ Standard Error: {s_e:.{precision}f}
 SSR: {ssr_value:.{precision}f}
 R-square: {r_square:.{precision}f}
 
-Estimated model: y = {intercept:.{precision}f} + {slope:.{precision}f} x
+Estimated model: y = {intercept:.{precision}f} + {slope:.{precision}f} x"""
 
+    if test == True:
+        results += f"""
 **** t-Test of Slope <{s_option}> ****
 t (observed value): {s_t_value:.{precision}f}
 t (critical value): {s_t_critical:.{precision}f}
@@ -177,3 +392,66 @@ Reject H_0 (Has Linear Relationship) → {flag}"""
     result_dict['description'] = results
 
     return result_dict
+
+
+def runs_test(x, cutoff='median', alpha=0.05, precision=4):
+    if cutoff == 'median':
+        cutoff = np.median(x)
+    elif cutoff == 'mean':
+        cutoff = np.mean(x)
+
+    indicator = (x >= cutoff)
+    n1 = np.sum(x >= cutoff)
+    n2 = np.sum(x < cutoff)
+    n_runs = 1
+
+    for i in range(1, len(indicator)):
+        if indicator[i] != indicator[i - 1]:
+            n_runs += 1
+
+    if n1 <= 20 and n2 <= 20:
+        display(_runs_test_table)
+        if n1 > n2:
+            big_n = n1
+            small_n = n2
+        else:
+            big_n = n2
+            small_n = n1
+
+        res = (_runs_test_table.loc[small_n, str(big_n)])
+        lb, ub = tuple(map(int, res.strip('()').split(', ')))
+        if n_runs < ub and n_runs > lb:
+            flag = False
+        else:
+            flag = True
+        des = f"""======= Runs Test =======
+(Both n1 ({n1}) and n2 ({n2}) <= 20)
+Runs = {n_runs}
+Lower bound and Upper bound = [{lb}, {ub}]
+Reject H_0 (Randomness does not exist) → {flag}
+"""
+        print(des)
+        return flag, ub, lb
+
+    else:
+        mu_r = 2 * n1 * n2 / (n1 + n2) + 1
+        sigma_r = math.sqrt(2 * n1 * n2 * (2 * n1 * n2 -
+                                           n1 - n2) / ((n1 + n2) ** 2 * (n1 + n2 - 1)))
+        z_value = (n_runs - mu_r) / sigma_r
+        p_value = (1 - stats.norm.cdf(z_value)) * 2
+        if (p_value > 1):
+            p_value = (stats.norm.cdf(z_value)) * 2
+        flag = p_value < alpha
+        des = f"""======= Runs Test =======
+(n1 ({n1}) or n2 ({n2}) > 20)
+Runs = {n_runs}
+runs_exp (mu_r) = {mu_r:.4f}
+std (sigma_r) = {sigma_r:4f}
+
+z-value (observed statistic) = {z_value:.4f}
+p-value = {p_value:.4f}
+Reject H_0 (Randomness does not exist) → {flag}
+"""
+        print(des)
+
+        return z_value, p_value
