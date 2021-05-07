@@ -63,7 +63,7 @@ def inter_p_value(p_value):
 def c_of_c_test(r, n, beta1=0, alpha=.05, precision=4, show=True, option='two-tail', **kwargs):
     """
     two-tail, right, left
-    kwargs needs to contain b1 and std_err if used: 
+    kwargs needs to contain b1 and std_err if used:
     >>> if beta1 != 0:
     >>>    t_value = (kwargs['b1'] - beta1) / kwargs['std_err']
     """
@@ -182,7 +182,15 @@ Prediction interval (confidence interval) for Exact Value: [{lower_bound2:.4f}, 
     return CI_PI
 
 
-def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, outlier=True, influential=True, plot=True, display_df=True):
+def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, outlier=True, influential=True, plot=True, display_df=True, **kwargs):
+    """
+    kwargs: 
+
+    + Pass in xlabel to specify the x label for individual residual plot
+    + pass in s_xlabel to specify the x label for the scatter plot
+    + pass in s_ylabel to specify the y label for the scatter plot
+    """
+
     df_res = smf.ols(f'{Dependence}~ {Independence}', data=df).fit()
     simple_table, data, ss3 = sso.summary_table(df_res, alpha=0.05)
     std_resid = data[:, 10]
@@ -222,7 +230,11 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
                     ms=circle_rad * 1.5, mec='violet', mfc='none', mew=2)
 
         plt.title('Standardized Residual Plot - Outliers in Violet Circle')
-        plt.xlabel('Predicted Dependent Variable')
+        try:
+            xlabel = kwargs['xlabel']
+        except KeyError:
+            xlabel = f'Predicted {Dependence}'
+        plt.xlabel(xlabel)
         plt.ylabel('Standardized Residual')
 
         return_dict['outlier-fig'] = fig
@@ -278,8 +290,11 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
 
         plt.title(
             f'Standardized Residual Plot - Influential Observations ($h_i > {6 / nobs}$) in Spring Green')
-        plt.xlabel(
-            'Predicted Dependent Variable')
+        try:
+            xlabel = kwargs['xlabel']
+        except KeyError:
+            xlabel = f'Predicted {Dependence}'
+        plt.xlabel(xlabel)
         plt.ylabel('Standardized Residual')
         # plt.legend()
         return_dict['inf-fig'] = fig
@@ -326,8 +341,16 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
     plt.legend()
 
     plt.title('Scatter Plot')
-    plt.xlabel(Independence)
-    plt.ylabel(Dependence)
+    try:
+        xlabel = kwargs['s_xlabel']
+    except KeyError:
+        xlabel = f'{Independence}'
+    try:
+        ylabel = kwargs['s_ylabel']
+    except KeyError:
+        ylabel = f'{Dependence}'
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
 
     add_margin(ax, x=0.02, y=0.00)  # Call this after tsplot
 
