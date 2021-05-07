@@ -228,6 +228,8 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
 
             ax.plot((y_id), (sr_id), 'o',
                     ms=circle_rad * 1.5, mec='violet', mfc='none', mew=2)
+        ax.plot([], [], 'o', ms=circle_rad * 0.5, mec='violet',
+                mfc='none', mew=2, label='Outliers')
 
         plt.title('Standardized Residual Plot - Outliers in Violet Circle')
         try:
@@ -287,6 +289,8 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
                     ms=circle_rad * 1.5, mec='springgreen', mfc='none', mew=2)
         # ax.set_aspect('equal', adjustable='datalim')
         # ax.add_patch(cir)
+        ax.plot([], [], 'o',
+                ms=circle_rad * 0.5, mec='springgreen', mfc='none', mew=2, label='Influential Observations')
 
         plt.title(
             f'Standardized Residual Plot - Influential Observations ($h_i > {6 / nobs}$) in Spring Green')
@@ -339,6 +343,9 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
         pass
 
     plt.legend()
+
+    ax.legend(loc='center left', bbox_to_anchor=(
+        1, 0.5), fancybox=True, shadow=True)
 
     plt.title('Scatter Plot')
     try:
