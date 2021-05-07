@@ -197,6 +197,7 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
         df_w_std_resid = df_w_std_resid[filter]
         # display(df_w_std_resid)
         return_dict['df_w_std_resid'] = df_w_std_resid
+        return_dict['outlier_filter'] = filter
 
         if display_df:
             print('Outliers:')
@@ -246,6 +247,7 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
         df_w_h = df_w_h[filter]
         return_dict['df_w_h'] = df_w_h
         return_dict['h cv'] = 6 / nobs
+        return_dict['inf_filter'] = filter
 
         if display_df:
             print('Influential Observations:')
