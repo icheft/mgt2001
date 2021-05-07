@@ -329,6 +329,8 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
 
             ax.plot((x_value), (y_id), 'o',
                     ms=circle_rad * 1.5, mec='violet', mfc='none', mew=2)
+        ax.plot([], [], 'o', ms=circle_rad * 0.5, mec='violet',
+                mfc='none', mew=2, label='Outliers')
     except:
         pass
     try:
@@ -339,6 +341,9 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
 
             ax.plot((x_value), (y_id), 'o',
                     ms=circle_rad * 1.5, mec='springgreen', mfc='none', mew=2)
+        ax.plot([], [], 'o',
+                ms=circle_rad * 0.5, mec='springgreen', mfc='none', mew=2, label='Influential Observations')
+
     except:
         pass
 
