@@ -396,6 +396,7 @@ def SimpleLinearRegression(Independence=None, Dependence=None, df=None, alpha=0.
     results = f"""======= Simple Linear Regression Results =======
 Dep. Variable: {Dependence}
 No. of Observations: {int(df_result.nobs)}
+Mean of Dep. Variable: {np.mean(df[Dependence]):.{precision}f}
 Standard Error: {s_e:.{precision}f}
 SSR: {ssr_value:.{precision}f}
 R-square: {r_square:.{precision}f}
@@ -404,6 +405,7 @@ Estimated model: y = {intercept:.{precision}f} + {slope:.{precision}f} x"""
 
     if test == True:
         results += f"""
+
 **** t-Test of Slope <{s_option}> ****
 t (observed value): {s_t_value:.{precision}f}
 t (critical value): {s_t_critical:.{precision}f}
