@@ -245,6 +245,7 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
         filter = (df_w_h['h (leverage)'] > 6 / nobs)
         df_w_h = df_w_h[filter]
         return_dict['df_w_h'] = df_w_h
+        return_dict['h cv'] = 6 / nobs
 
         if display_df:
             print('Influential Observations:')
@@ -274,7 +275,7 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
         # ax.add_patch(cir)
 
         plt.title(
-            'Standardized Residual Plot - Influential Observations in Spring Green')
+            f'Standardized Residual Plot - Influential Observations ($h_i > {6 / nobs}$) in Spring Green')
         plt.xlabel(
             'Predicted Dependent Variable')
         plt.ylabel('Standardized Residual')
