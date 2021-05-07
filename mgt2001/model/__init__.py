@@ -182,7 +182,7 @@ Prediction interval (confidence interval) for Exact Value: [{lower_bound2:.4f}, 
     return CI_PI
 
 
-def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, outlier=True, influential=True):
+def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, outlier=True, influential=True, plot=True, display_df=True):
     df_res = smf.ols(f'{Dependence}~ {Independence}', data=df).fit()
     simple_table, data, ss3 = sso.summary_table(df_res, alpha=0.05)
     std_resid = data[:, 10]
@@ -197,6 +197,10 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
         df_w_std_resid = df_w_std_resid[filter]
         # display(df_w_std_resid)
         return_dict['df_w_std_resid'] = df_w_std_resid
+
+        if display_df:
+            print('Outliers:')
+            display(df_w_std_resid)
 
         y_pre = data[:, 2]  # x
 
@@ -223,9 +227,12 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
         return_dict['outlier-fig'] = fig
         return_dict['outlier-ax'] = ax
 
-        plt.show()
+        if plot:
+            plt.show()
+        else:
+            plt.close()
 
-    if influencial:
+    if influential:
         df_w_h = df.copy().reset_index().rename(columns={'index': 'ID'})
         x_data = df[Independence].values
         y_data = df[Dependence].values
@@ -238,6 +245,10 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
         filter = (df_w_h['h (leverage)'] > 6 / nobs)
         df_w_h = df_w_h[filter]
         return_dict['df_w_h'] = df_w_h
+
+        if display_df:
+            print('Influential Observations:')
+            display(df_w_h)
 
         y_pre = data[:, 2]  # x
 
@@ -271,6 +282,11 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
         return_dict['inf-fig'] = fig
         return_dict['inf-ax'] = ax
         plt.show()
+
+        if plot:
+            plt.show()
+        else:
+            plt.close()
 
     # Scatter Plot with Two Variables and Fixed Margins (Seaborn included)
     fig, ax = plt.subplots()
@@ -314,7 +330,11 @@ def SimpleLinearRegressionOutlier(Independence=None, Dependence=None, df=None, o
 
     return_dict['all-fig'] = fig
     return_dict['all-ax'] = ax
-    plt.show()
+
+    if plot:
+        plt.show()
+    else:
+        plt.close()
 
     return return_dict
 
