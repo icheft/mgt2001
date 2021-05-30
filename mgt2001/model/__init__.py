@@ -13,11 +13,13 @@ import statsmodels.formula.api as smf
 from statsmodels.stats.stattools import durbin_watson as sdw
 from . import table
 from .model_building import *
+from .model_building import _color_palette
 
 
 _runs_test_table = pd.read_csv(table._raw_r_table, index_col=0)
 
 _dwcrit_table = pd.read_csv(table._dwcrit_table, index_col=0)
+_dwcrit_table25 = pd.read_csv(table._dwcrit_table25, index_col=0)
 
 
 def durbin_watson(std_resid, n=None, k=None, option='positive', precision=4):
@@ -29,6 +31,8 @@ def durbin_watson(std_resid, n=None, k=None, option='positive', precision=4):
     + option = 'negative' / 'left-tail'
     """
     rej_h_0_prompt = ""
+    dwcrit_table = _dwcrit_table
+    alpha = 0.05
     if option.lower()[0] == 'p' or option.lower()[0] == 'r':
         opt = 'r'
         rej_h_0_prompt = 'The data are positively first-order correlated'
@@ -37,11 +41,13 @@ def durbin_watson(std_resid, n=None, k=None, option='positive', precision=4):
         rej_h_0_prompt = 'The data are negatively first-order correlated'
     else:
         opt = 't'
+        alpha = 0.025
+        dwcrit_table = _dwcrit_table25
         rej_h_0_prompt = 'The data are first-order correlated'
 
     d = sdw(std_resid)
-    d_l, d_u = _dwcrit_table[(_dwcrit_table['Sample Size'] == n) & (_dwcrit_table['Number of terms (including the intercept)'] == k + 1)][['D  L',
-                                                                                                                                           'D  U']].values.tolist()[0]
+    d_l, d_u = dwcrit_table[(dwcrit_table['Sample Size'] == n) & (dwcrit_table['Number of terms (including the intercept)'] == k + 1)][['D  L',
+                                                                                                                                        'D  U']].values.tolist()[0]
 
     d_result = f'''
 d = {d:.{precision}f}
@@ -92,7 +98,7 @@ with n = {n} and k = {k}
 d = {d:.{precision}f}
 (d_l, d_u) = ({d_l:.{2}f}, {d_u:.{2}f})
 
-with n = {n} and k = {k} / alpha = 0.05
+with n = {n} and k = {k} / alpha = {alpha}
 
 Reject H_0 ({rej_h_0_prompt}) → {flag}
 """
@@ -165,7 +171,7 @@ p-value = {p_value:.{precision}f} ({inter_p_value(p_value)})
     return t_value, t_critical, p_value, option
 
 
-def multi_scatter_plot(row, col, df, x_names, y_name, figsize=(13, 7), hspace=0.2, wspace=0.2):
+def multi_scatter_plot(row, col, df, x_names, y_name, figsize=(13, 7), hspace=0.2, wspace=0.2, scatter_show=True, corr_show=True):
     fig = plt.figure(figsize=figsize)
     fig.subplots_adjust(hspace=hspace, wspace=wspace)
     y_var = df[y_name]
@@ -189,13 +195,19 @@ def multi_scatter_plot(row, col, df, x_names, y_name, figsize=(13, 7), hspace=0.
         add_margin(ax, x=0.02, y=0.00)  # Call this after tsplot
 
     fig.tight_layout()
-    plt.show()
+    if scatter_show:
+        plt.show()
+    else:
+        plt.close()
 
     df_corr = df[[y_name] + x_names]
     corr = df_corr.corr()
     fig, ax = plt.subplots()
     _ = sns.heatmap(corr, annot=True)
-    plt.show()
+    if corr_show:
+        plt.show()
+    else:
+        plt.close()
 
 
 def SimpleLinearRegressionPrediction(x_name=None, y_name=None, df=None, x=None, alpha=0.05, plot=True, kwargs={'title': 'Two Types of Intervals', 'xlabel': 'Independent Variable', 'ylabel': 'Dependent Variable'}):
@@ -892,7 +904,7 @@ def MultipleRegressionOutlier(x_names=None, y_name=None, df=None, std_resid=None
     return return_dict
 
 
-def MultipleRegressionResidual(x_names=None, y_name=None, df=None, reg_result=None, alpha=0.05, precision=4):
+def MultipleRegressionResidual(x_names=None, y_name=None, df=None, reg_result=None, durbin_watson_test=True, durbin_watson_test_option='two-tail', alpha=0.05, precision=4):
     """
     np.mean(std_resid), np.std(std_resid, ddof=1)
     """
@@ -959,10 +971,17 @@ Reject H_0 (Not normally distributed) → {p_value < alpha}
 
     runs_test(std_resid, cutoff='median', alpha=alpha, precision=precision)
 
+    if durbin_watson_test:
+        durbin_watson(std_resid, n=len(
+            std_resid), k=reg_result.df_model, option=durbin_watson_test_option)
+
     return np.mean(std_resid), np.std(std_resid, ddof=1)
 
 
 def MultipleRegression(x_names=None, y_name=None, df=None, alpha=0.05, precision=4, show_summary=True, assessment=True, t_test_c=0, t_test_option='two-tail'):
+    """
+    assessment is equivalent to t_test: boolean
+    """
     res_dict = dict()
     y_data = df[y_name]
     X_data_T = np.array(df[x_names])
