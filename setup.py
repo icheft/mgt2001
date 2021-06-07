@@ -12,7 +12,7 @@ def get_version(path):
 
 
 installations = ['numpy', 'pandas', 'matplotlib', 'adjustText', 'scipy', 'ete3',
-                 'seaborn', 'stemgraphic', 'statsmodels', 'plotly', 'pymdown-extensions', 'mkdocs', 'mkdocs-material', 'sympy']
+                 'seaborn', 'stemgraphic', 'statsmodels', 'plotly', 'pymdown-extensions', 'mkdocs', 'mkdocs-material', 'sympy', 'mplfinance']
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
