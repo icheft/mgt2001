@@ -210,6 +210,20 @@ def multi_scatter_plot(row, col, df, x_names, y_name, figsize=(13, 7), hspace=0.
         plt.close()
 
 
+def multicollinearity(df, x_names, y_name):
+    df_corr = df[[y_name] + x_names]
+    corr = df_corr.corr()
+    coef = corr.iloc[:, 0].values
+
+    def _highlight(val):
+        color = 'salmon' if (abs(val) >= 0.7 and val !=
+                             1 and val not in coef) else 'default'
+        return 'background-color: %s' % color
+
+    style_df = corr.style.applymap(_highlight)
+    return style_df
+
+
 def SimpleLinearRegressionPrediction(x_name=None, y_name=None, df=None, x=None, alpha=0.05, plot=True, kwargs={'title': 'Two Types of Intervals', 'xlabel': 'Independent Variable', 'ylabel': 'Dependent Variable'}):
     """
 
@@ -359,6 +373,7 @@ def SimpleLinearRegressionOutlier(x_name=None, y_name=None, df=None, outlier=Tru
 
     if influential:
         df_w_h = df.copy().reset_index().rename(columns={'index': 'ID'})
+        df_w_h['ID'] += 1
         x_data = df[x_name].values
         y_data = df[y_name].values
         cov_mat1 = np.cov(y_data, x_data)
@@ -573,44 +588,80 @@ Reject H_0 (Has Linear Relationship) → {flag}"""
     return result_dict, results
 
 
-def MultipleRegressionPrediction(x_names=None, y_name=None, df=None, x1=None, alpha=0.05, precision=4):
+def MultipleRegressionPrediction(x_names=None, y_name=None, df=None, x1=None, alpha=0.05, precision=4, ts=False, **kwargs):
+    """
+    if ts = True: x1 is required to be a list (iterable)
+    """
     # print("make CI and PI prediction at mean of x = ", x1)
-    x1.insert(0, 1)
-    X_data_T = np.array(df[x_names])
-    X_data2 = sm.add_constant(X_data_T)
-    olsmod = sm.OLS(df[y_name], X_data2)
-    result_reg = olsmod.fit()
-    # print(result_reg.params, x1)
-    y_head = np.dot(result_reg.params, x1)
-    # print("y_head = ", y_head)
-    (t_minus, t_plus) = stats.t.interval(
-        alpha=(1.0 - alpha), df=result_reg.df_resid)
-    core1 = (result_reg.mse_resid * np.matmul(x1,
-                                              np.linalg.solve(np.matmul(X_data2.T, X_data2), x1))) ** 0.5
-    lower_bound = y_head + t_minus * core1
-    upper_bound = y_head + t_plus * core1
-    # print("confidence interval of mean = [%0.4f, %0.4f] " % (
-    #     lower_bound, upper_bound))
-    core2 = (result_reg.mse_resid * (1 + np.matmul(x1,
-                                                   np.linalg.solve(np.matmul(X_data2.T, X_data2), x1)))) ** 0.5
-    lower_bound2 = y_head + t_minus * core2
-    upper_bound2 = y_head + t_plus * core2
+    if ts:
+        tdf = df.copy()
+        df_result = kwargs['df_result']
+        time_name = kwargs['time_name']
+        _, data, _ = sso.summary_table(df_result, alpha=0.05)
+        new_t = np.array(x1)
+        if len(x1) == 0:
+            tdf[f'Pre_{y_name}'] = data[:, 2]
+            return tdf
+        elif len(x1) == 1:
+            search_table = pd.DataFrame(x1, columns=x_names)
+            x1 = [1] + x1[0]
+            new_t = np.array([x1])
+            # print(new_t)
+        else:
+            search_table = pd.DataFrame(x1, columns=x_names)
+            new_t = sm.add_constant(new_t)
 
-    result = f"""======= Making Prediction =======
-Make CI and PI predictions at mean of x = {x1}
-y_head = {y_head}
+        pred_y = df_result.predict(new_t)
+        tdf[f'Pre_{y_name}'] = data[:, 2]
+        # tdf[x_name] = np.append(tdf[x_name], new_t)
+        for i in range(search_table.shape[0]):
+            append_dict = {}
+            for x in x_names:
+                print(x)
+                append_dict[x] = search_table.iloc[i, :][x]
+            append_dict[f'Pre_{y_name}'] = pred_y[i]
+            tdf = tdf.append(
+                append_dict, ignore_index=True)
 
-----------------
-{pd.DataFrame(result_reg.params, columns=['coef'])}
-----------------
+        return tdf
 
-Confidence interval for mean: [{lower_bound:.{precision}f}, {upper_bound:.{precision}f}]
-Prediction interval (confidence interval) for Exact Value: [{lower_bound2:.{precision}f}, {upper_bound2:.{precision}f}]
-"""
-    print(result)
-    CI_PI = {'CI': [lower_bound, upper_bound],
-             'PI': [lower_bound2, upper_bound2]}
-    return CI_PI
+    else:
+        x1.insert(0, 1)
+        X_data_T = np.array(df[x_names])
+        X_data2 = sm.add_constant(X_data_T)
+        olsmod = sm.OLS(df[y_name], X_data2)
+        result_reg = olsmod.fit()
+        # print(result_reg.params, x1)
+        y_head = np.dot(result_reg.params, x1)
+        # print("y_head = ", y_head)
+        (t_minus, t_plus) = stats.t.interval(
+            alpha=(1.0 - alpha), df=result_reg.df_resid)
+        core1 = (result_reg.mse_resid * np.matmul(x1,
+                                                  np.linalg.solve(np.matmul(X_data2.T, X_data2), x1))) ** 0.5
+        lower_bound = y_head + t_minus * core1
+        upper_bound = y_head + t_plus * core1
+        # print("confidence interval of mean = [%0.4f, %0.4f] " % (
+        #     lower_bound, upper_bound))
+        core2 = (result_reg.mse_resid * (1 + np.matmul(x1,
+                                                       np.linalg.solve(np.matmul(X_data2.T, X_data2), x1)))) ** 0.5
+        lower_bound2 = y_head + t_minus * core2
+        upper_bound2 = y_head + t_plus * core2
+
+        result = f"""======= Making Prediction =======
+    Make CI and PI predictions at mean of x = {x1}
+    y_head = {y_head}
+
+    ----------------
+    {pd.DataFrame(result_reg.params, columns=['coef'])}
+    ----------------
+
+    Confidence interval for mean: [{lower_bound:.{precision}f}, {upper_bound:.{precision}f}]
+    Prediction interval (confidence interval) for Exact Value: [{lower_bound2:.{precision}f}, {upper_bound2:.{precision}f}]
+    """
+        print(result)
+        CI_PI = {'CI': [lower_bound, upper_bound],
+                 'PI': [lower_bound2, upper_bound2]}
+        return CI_PI
 
 
 def MultipleRegressionOutlier(x_names=None, y_name=None, df=None, std_resid=None, outlier=True, influential=True, cook=True, alpha=.05, plot=True, display_df=True, **kwargs):
