@@ -1,6 +1,167 @@
 from numpy.testing._private.utils import measure
+import statsmodels.stats.outliers_influence as sso
+import statsmodels.api as sm
 import pandas as pd
 import numpy as np
+
+
+def cma(y_v, period: int):
+    y_v_MA_a = np.zeros(len(y_v))
+    y_v_MA_a[:] = np.nan
+    n = period
+    if n % 2 == 0:  # even
+        halfwin = int(n / 2)
+        y_v_MA_ta = np.zeros(len(y_v))
+        # first attempt
+        for i in range(halfwin, len(y_v) - halfwin + 1):
+            y_v_MA_ta[i] = np.mean(y_v[(i-halfwin): (i+halfwin)])
+        # second attempt
+        for ii in range(halfwin, len(y_v) - halfwin):
+            y_v_MA_a[ii] = np.mean(y_v_MA_ta[(ii): (ii+2)])
+    else:  # odd
+        halfwin = int((n - 1) / 2)
+        for i in range(halfwin, len(y_v) - halfwin):
+            y_v_MA_a[i] = np.mean(y_v[(i-halfwin): (i+halfwin+1)])
+    return y_v_MA_a
+
+
+def seasonal_index(y_v, period: int, show=False, option='cma'):
+    """
+    return seasonal index and a Series with all observations linked to its seasonal index
+    """
+    n = period
+    if option == 'cma':
+        SI_MA_a = np.zeros(len(y_v))
+        SI_MA_a[:] = np.nan
+        SI_MA_a = y_v / cma(y_v, period)
+        SI_id_s = np.arange(1, len(y_v)+1)
+        SI_id = SI_id_s - np.floor(SI_id_s / n) * n
+        SI_id[np.where((SI_id[:] == 0))] = n
+        SI_MA_df = pd.DataFrame({'SIMA': SI_MA_a, 'SIid': SI_id})
+        SI_MA_u = np.zeros(n)
+        for j in range(1, n+1):
+            SI_MA_u[j-1] = SI_MA_df['SIMA'][SI_MA_df['SIid']
+                                            == j].dropna().mean()
+        SI_MA = SI_MA_u / sum(SI_MA_u) * n
+        if show:
+            print('Seasonal Index:', SI_MA)
+        return SI_MA, SI_MA_df['SIid']
+    elif option == 'lr':
+        y_data = y_v
+        X_data_ar = np.arange(1, len(y_v)+1)
+        X_data_T = X_data_ar.T
+        X_data = pd.DataFrame(X_data_T, columns=['Time'])
+        X_data = sm.add_constant(X_data)
+        olsmod = sm.OLS(y_data, X_data)
+        result_reg = olsmod.fit()
+        st, data, ss2 = sso.summary_table(result_reg, alpha=0.05)
+        y_v_LR_a = data[:, 2]
+        SI_LR_a = y_v / y_v_LR_a
+        SI_id_s = np.arange(1, len(y_v)+1)
+        SI_id = SI_id_s - np.floor(SI_id_s / n) * n
+        SI_id[np.where((SI_id[:] == 0))] = n
+        SI_LR_a_df = pd.DataFrame({'SILR': SI_LR_a, 'SIid': SI_id})
+        SI_LR_u = np.zeros(n)
+        for j in range(1, n+1):
+            SI_LR_u[j-1] = SI_LR_a_df['SILR'][SI_LR_a_df['SIid']
+                                              == j].dropna().mean()
+        SI_LR = SI_LR_u / sum(SI_LR_u) * n
+
+        if show:
+            print('Seasonal Index:', SI_LR)
+
+        return SI_LR, SI_LR_a_df['SIid']
+
+
+def deseasonalize(y_v, period: int, show=False, option='cma'):
+    y_v_SI_MA = np.zeros(len(y_v))
+    DSI_y_v = np.zeros(len(y_v))
+    if option == 'cma':
+        SI_MA, SIid = seasonal_index(y_v, period, show, option=option)
+
+        for k in range(0, len(y_v)):
+            Idd = int(SIid[k] - 1)
+            y_v_SI_MA[k] = SI_MA[Idd]
+            DSI_y_v[k] = y_v[k] / SI_MA[Idd]
+        if show:
+            print('Deseasonalized Data:', DSI_y_v)
+
+        SI_MA_result_m = np.array([SIid, y_v_SI_MA, y_v, DSI_y_v])
+        SI_MA_result_df = pd.DataFrame(SI_MA_result_m.T, columns=[
+            'SID', 'SeaIdx', 'orig', 'Des_Y'])
+
+        return {'deasonalized_y': DSI_y_v, 'seasonal_i': SIid, 'des_result': SI_MA_result_df, 'SI_MA': SI_MA}
+    elif option == 'lr':
+        y_v_SI_LR = np.zeros(len(y_v))
+        DSI_y_v = np.zeros(len(y_v))
+        SI_LR, SIid = seasonal_index(y_v, period, show, option=option)
+        for k in range(0, len(y_v)):
+            Idd = int(SIid[k] - 1)
+            y_v_SI_LR[k] = SI_LR[Idd]
+            DSI_y_v[k] = y_v[k] / SI_LR[Idd]
+
+        if show:
+            print('Deseasonalized Data:', DSI_y_v)
+        SI_LR_result_a = np.array([SIid, y_v_SI_LR, y_v, DSI_y_v])
+        SI_LR_result_df = pd.DataFrame(SI_LR_result_a.T, columns=[
+                                       'SID', 'SeaIdx', 'orig', 'Des_Y'])
+        return {'deasonalized_y': DSI_y_v, 'seasonal_i': SIid, "des_result": SI_LR_result_df, "SI_LR": SI_LR}
+
+
+def smoothing_cma(df, y_name, time_name, period, show=False):
+    DSI_y_v, SIid, des_result, SI_MA = deseasonalize(
+        df[y_name], period, show, option='cma').values()
+    des_result.rename(columns={'Des_Y': f'Des_{y_name}'}, inplace=True)
+    return pd.concat([df, des_result], axis=1)
+
+
+def smoothing_lr(df, y_name, time_name, period, show=False):
+    DSI_y_v, SIid, des_result, SI_LR = deseasonalize(
+        df[y_name], period, show, option='lr').values()
+    des_result.rename(columns={'Des_Y': f'Des_{y_name}'}, inplace=True)
+    return pd.concat([df, des_result], axis=1)
+
+
+def smoothing(df, y_name, time_name, period, show=False, option='cma'):
+    DSI_y_v, SIid, des_result, SI = deseasonalize(
+        df[y_name], period, show, option=option).values()
+    des_result.rename(columns={'Des_Y': f'Des_{y_name}'}, inplace=True)
+    return pd.concat([df, des_result], axis=1)
+
+
+def seasonal_prediction(df, df_result, y_name, time_name, new_t, period, show=False, option='cma'):
+    """
+    df should be the deseasoned df if possible
+    """
+    y_v = df[y_name]
+    if len(new_t) == 0:
+        _, data, _ = sso.summary_table(df_result, alpha=0.05)
+        trend_proj = df_result.predict(sm.add_constant(new_t))
+        df_result.predict(sm.add_constant(new_t))
+        tdf = df.copy()
+        tdf[f'Pre_{y_name}'] = data[:, 2] * tdf['SeaIdx']
+        return tdf
+    else:
+        new_t = np.array(new_t)
+        SI, SIid = seasonal_index(y_v, period, show, option=option)
+        # des_df = smoothing_cma(df, y_name, time_name,
+        #                        period=period, show=show)  # final df secured
+
+        trend_proj = df_result.predict(sm.add_constant(new_t))
+        seasonal_adj = trend_proj * SI
+        # new_t = np.arange(12, 16)
+        _, data, _ = sso.summary_table(df_result, alpha=0.05)
+        trend_proj = df_result.predict(sm.add_constant(new_t))
+        df_result.predict(sm.add_constant(new_t))
+        tdf = df.copy()
+        tdf[f'Pre_{y_name}'] = data[:, 2] * tdf['SeaIdx']
+
+        # tdf[x_name] = np.append(tdf[x_name], new_t)
+        for i, t in enumerate(new_t):
+            tdf = tdf.append({time_name: t, 'SID': tdf['SID'].values[-(1 + i) - (len(new_t) - (1 + i))], 'SeaIdx': tdf['SeaIdx'].values[-(1 + i) - (
+                len(new_t) - (1 + i))], f'Pre_{y_name}': trend_proj[i] * tdf['SeaIdx'].values[-(1 + i) - (len(new_t) - (1 + i))]}, ignore_index=True)
+
+    return tdf
 
 
 def mav(df, n, y_name, time_name, weight: list = None):
@@ -128,7 +289,7 @@ MAPE = {err_dict['MAPE']:.{precision}f}%
     else:
         err_df = pd.DataFrame(columns=measurements, index=[
                               'MAD', 'MSE', 'RMSE', 'MAPE'])
-
+        df = df.dropna()
         for measurement in measurements:
             y = df[y_name]
             pred_y = df[measurement]
