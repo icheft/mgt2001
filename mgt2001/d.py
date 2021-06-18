@@ -699,7 +699,7 @@ def multiple_residual(df, xnames, yname, alpha = 0.05, nobins = 6):
     CD_arr = np.square(y_a - y_f) / s2_e / (k - 1) * h_i / np.square(1 - h_i)
     CD = np.array(CD_arr)
     df_cd = pd.DataFrame(CD,columns = ['CD'])
-    display(df_cd.head())
+    print(df_cd.head())
     filter = (df_cd['CD'] > 1 )
     print("Influential Observations by Cook's Distances =\n")
     print(df_cd['CD'].loc[filter])
