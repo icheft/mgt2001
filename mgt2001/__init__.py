@@ -17,7 +17,7 @@ from . import hyp  # hypothesis
 from . import model  # modeling
 from . import time_series as ts  # time series
 # from . import t  # hypothesis using t instead of z
-from . import class # teamwork (mainly from @derekdylu)
+from . import team  # teamwork (mainly from @derekdylu)
 
 from ._version import __version__
 
