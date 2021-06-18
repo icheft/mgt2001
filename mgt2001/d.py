@@ -1,5 +1,4 @@
 from matplotlib import pyplot as plt
-plt.rcParams["figure.dpi"] = 100
 import seaborn as sns
 import pandas as pd
 import numpy as np
