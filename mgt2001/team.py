@@ -180,7 +180,7 @@ def runsTest(l, l_median):
     print('pval_z = ', pval_z)
     return pval_z
 
-def simple_residual(df, xname, yname, alpha = 0.05, resd_all = True, nobins = 6):
+def simple_residual(df, xname, yname, alpha = 0.05, resd_all = False, nobins = 6):
     print("\n\n----------------------------\n|Residual Analysis - simple|\n----------------------------\n")
     print("using alpha = ", alpha)
     print("\n\n ◆ Residuals\n")
@@ -303,7 +303,7 @@ def simple_residual(df, xname, yname, alpha = 0.05, resd_all = True, nobins = 6)
     x_data_bar = x_data.mean()
     data_nobs = len(x_data)
     h_val = 1 / data_nobs + (x_data - x_data_bar) ** 2 / (data_nobs - 1) / cov_mat1[1,1]
-    print(h_val)
+    # print(h_val)
     df_hi = pd.DataFrame(h_val, columns = ['hi'])
     filter = (df_hi['hi'] > nobins / data_nobs )
     print("Influential Observations by hi = ", df_hi['hi'].loc[filter])
@@ -417,7 +417,7 @@ def simple_CIPIINT_regplot(df, xname, yname, alpha = 0.05):
     plt.legend(['data points', 'regression model', 'confidence interval', 'prediction interval'], title = 'Legends', bbox_to_anchor = (1.3, 1), prop={'size': 6})
     plt.show()
 
-def simple(step, df, xname, yname, alpha = 0.05, tail = 'db', nobins = 6):
+def simple(step, df, xname, yname, alpha = 0.05, tail = 'db', nobins = 6, resd_all = False):
     if step == 1:
         simple_regplot(df, xname, yname)
     elif step == 2:
@@ -429,7 +429,7 @@ def simple(step, df, xname, yname, alpha = 0.05, tail = 'db', nobins = 6):
         simple_durbin_watson(df, xname, yname, alpha = alpha)
     elif step == 5:
         print("\nremember to remove outliers or do some modifications.\n")
-        simple_residual(df, xname, yname, alpha = alpha, resd_all = True, nobins = nobins)
+        simple_residual(df, xname, yname, alpha = alpha, resd_all = resd_all, nobins = nobins)
     elif step == 6:
         simple_modass(df, xname, yname, alpha = alpha, tail = tail)
     elif step == 7:
