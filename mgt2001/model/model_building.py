@@ -55,25 +55,25 @@ def multi_variable_plot(x_name=None, y_name=None, x_names: list = None, indicato
         y_name = 'Price'
         indicator = 'Color'
     fit = True:
-        label={1: 'White', 2: 'Silver', 3: 'Other Colors'}, 
+        label={1: 'White', 2: 'Silver', 3: 'Other Colors'},
         df=df_onehot
-        x_name = 'Odometer', 
-        y_name = 'Price', 
-        indicator = 'Color', 
+        x_name = 'Odometer',
+        y_name = 'Price',
+        indicator = 'Color',
         x_names = ['Odometer', 'color_1', 'color_2'],  # 1
         df_result=res_dict['df_result'], # df_result = df_result
-        x = [{'b0': [0, 2], 'b1': [1, 4]}, 
-            {'b0': [0, 3], 'b1': [1, 5]}, 
+        x = [{'b0': [0, 2], 'b1': [1, 4]},
+            {'b0': [0, 3], 'b1': [1, 5]},
             {'b0': [0], 'b1': [1]}] # 手動輸入哪些項目是要被加入的（go by params (start with constant))
         # ind_start = 1 (start with first independent variable)
     """
-    n = len(label)
-    color = _color_palette(n, cmap)
-    if fit == False:
+    if x_names is not None:
+        n = len(x_names)
+        color = _color_palette(n, cmap)
         fig, ax = plt.subplots()
-        for i, (key, value) in enumerate(label.items()):
+        for i, (col_name) in enumerate(x_names):
             _ = sns.regplot(
-                x=x_name, y=y_name, data=df[df[indicator] == key], color=color[i], ci=None, label=value)
+                x=x_name, y=y_name, data=df[df[col_name] == 1], color=color[i], ci=None, label=col_name)
 
         plt.legend()
         plt.title(f'Scatter Plot for {x_name} and {y_name}')
@@ -82,79 +82,95 @@ def multi_variable_plot(x_name=None, y_name=None, x_names: list = None, indicato
         _add_margin(ax, x=0.02, y=0.00)  # Call this after tsplot
         plt.show()
     else:
-        fig, ax = plt.subplots()
+        n = len(label)
+        color = _color_palette(n, cmap)
+        if fit == False:
+            fig, ax = plt.subplots()
+            for i, (key, value) in enumerate(label.items()):
+                _ = sns.regplot(
+                    x=x_name, y=y_name, data=df[df[indicator] == key], color=color[i], ci=None, label=value)
 
-        x_ind = df_result.params.index
-        X_plot = np.linspace(df[x_name].min(),
-                             df[x_name].max(), 100)
-        k = len(label) - 1  # 2
+            plt.legend()
+            plt.title(f'Scatter Plot for {x_name} and {y_name}')
+            plt.xlabel(x_name)
+            plt.ylabel(y_name)
+            _add_margin(ax, x=0.02, y=0.00)  # Call this after tsplot
+            plt.show()
+        else:
+            fig, ax = plt.subplots()
 
-        try:
-            ind_start = kwargs['ind_start']
-            ind_end = ind_start + len(label) - 2
-        except:
-            ind_start = -1
+            x_ind = df_result.params.index
+            X_plot = np.linspace(df[x_name].min(),
+                                 df[x_name].max(), 100)
+            k = len(label) - 1  # 2
 
-        try:
-            snd_ind_start = kwargs['snd_ind_start']
-            snd_ind_end = snd_ind_start + len(label) - 2
-        except:
-            snd_ind_start = -1
+            try:
+                ind_start = kwargs['ind_start']
+                ind_end = ind_start + len(label) - 2
+            except:
+                ind_start = -1
 
-        try:
-            x_iter = kwargs['x']
-            x_iter_flag = True
-        except:
-            x_iter_flag = False
+            try:
+                snd_ind_start = kwargs['snd_ind_start']
+                snd_ind_end = snd_ind_start + len(label) - 2
+            except:
+                snd_ind_start = -1
 
-        for i, (key, value) in enumerate(label.items()):
-            _ = sns.scatterplot(
-                x=x_name, y=y_name, data=df[df[indicator] == key], color=color[i], label=value)
+            try:
+                x_iter = kwargs['x']
+                x_iter_flag = True
+            except:
+                x_iter_flag = False
 
-            if ind_start != -1:
-                if ind_start <= ind_end:
-                    b0 = df_result.params[0] + df_result.params[ind_start + 1]
-                    ind_start += 1
+            for i, (key, value) in enumerate(label.items()):
+                _ = sns.scatterplot(
+                    x=x_name, y=y_name, data=df[df[indicator] == key], color=color[i], label=value)
+
+                if ind_start != -1:
+                    if ind_start <= ind_end:
+                        b0 = df_result.params[0] + \
+                            df_result.params[ind_start + 1]
+                        ind_start += 1
+                    else:
+                        b0 = df_result.params[0]
                 else:
                     b0 = df_result.params[0]
-            else:
-                b0 = df_result.params[0]
 
-            if snd_ind_start != -1:
-                if snd_ind_start <= snd_ind_end:
-                    b1 = df_result.params[1] + \
-                        df_result.params[snd_ind_start + 1]
-                    snd_ind_start += 1
+                if snd_ind_start != -1:
+                    if snd_ind_start <= snd_ind_end:
+                        b1 = df_result.params[1] + \
+                            df_result.params[snd_ind_start + 1]
+                        snd_ind_start += 1
+                    else:
+                        b1 = df_result.params[1]
                 else:
                     b1 = df_result.params[1]
-            else:
-                b1 = df_result.params[1]
 
-            x_iter_str = ""
-            if x_iter_flag:
-                # [{'b0': (0, 2), 'b1': (1, 4)}, {'b0': (0, 3), 'b1': (1, 5)}, {'b0': (0), 'b1': (1)}]
-                b0 = b1 = 0
-                for b0_param in x_iter[i]['b0']:
-                    b0 += df_result.params[b0_param]
-                for b1_param in x_iter[i]['b1']:
-                    b1 += df_result.params[b1_param]
-                x_iter_str += f'\n$b_0$: ({", ".join(list(map(str, x_iter[i]["b0"])))}) / $b_1$: ({", ".join(list(map(str, x_iter[i]["b1"])))})'
+                x_iter_str = ""
+                if x_iter_flag:
+                    # [{'b0': (0, 2), 'b1': (1, 4)}, {'b0': (0, 3), 'b1': (1, 5)}, {'b0': (0), 'b1': (1)}]
+                    b0 = b1 = 0
+                    for b0_param in x_iter[i]['b0']:
+                        b0 += df_result.params[b0_param]
+                    for b1_param in x_iter[i]['b1']:
+                        b1 += df_result.params[b1_param]
+                    x_iter_str += f'\n$b_0$: ({", ".join(list(map(str, x_iter[i]["b0"])))}) / $b_1$: ({", ".join(list(map(str, x_iter[i]["b1"])))})'
 
-            Y_plot = b0 + b1 * X_plot
-            if x_iter_flag:
-                plt.plot(X_plot, Y_plot, color=color[i],
-                         label=f'$\hat y = {b0:.2f} + {b1:2f}x$ ({x_iter_str})')
-            else:
-                plt.plot(X_plot, Y_plot, color=color[i],
-                         label=f'$\hat y = {b0:.2f} + {b1:2f}x$')
+                Y_plot = b0 + b1 * X_plot
+                if x_iter_flag:
+                    plt.plot(X_plot, Y_plot, color=color[i],
+                             label=f'$\hat y = {b0:.2f} + {b1:2f}x$ ({x_iter_str})')
+                else:
+                    plt.plot(X_plot, Y_plot, color=color[i],
+                             label=f'$\hat y = {b0:.2f} + {b1:2f}x$')
 
-        # plt.legend()
-        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+            # plt.legend()
+            plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-        plt.title('Fit Lines')
-        plt.xlabel(x_name)
-        plt.ylabel(y_name)
-        plt.show()
+            plt.title('Fit Lines')
+            plt.xlabel(x_name)
+            plt.ylabel(y_name)
+            plt.show()
 
 
 def LogisticRegression(x_names=None, y_name=None, df=None, alpha=0.05, precision=4, show_summary=True):
