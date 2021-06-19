@@ -303,7 +303,7 @@ def simple_residual(df, xname, yname, alpha = 0.05, resd_all = False, nobins = 6
     x_data_bar = x_data.mean()
     data_nobs = len(x_data)
     h_val = 1 / data_nobs + (x_data - x_data_bar) ** 2 / (data_nobs - 1) / cov_mat1[1,1]
-    print(h_val)
+    # print(h_val)
     df_hi = pd.DataFrame(h_val, columns = ['hi'])
     filter = (df_hi['hi'] > nobins / data_nobs )
     print("Influential Observations by hi = ", df_hi['hi'].loc[filter])
