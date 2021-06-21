@@ -17,8 +17,55 @@ from scipy.optimize import curve_fit
 from statsmodels.tsa.ar_model import AutoReg, ar_select_order
 from statsmodels.tsa.api import acf, pacf, graphics
 
+##################### MICHAEL #####################
 
+
+def Outlier_and_InfObs(standard_resid=None, x_data=None, y_data=None, Multi=True, df=None):
+    outlier_index = []
+    infobs_index = []
+    # print ('Outliers :')
+    for i in range(len(standard_resid)):
+        if (standard_resid[i] < -2 or standard_resid[i] > 2):
+            outlier_index.append(i)
+            # print (i, standard_resid[i])
+
+    print("\n")
+
+    if (not Multi):
+        cov_mat = np.cov(y_data, x_data)
+        x_bar = x_data.mean()
+        nobs = len(x_data)
+        h_val = 1 / nobs + (x_data - x_bar) ** 2 / (nobs - 1) / cov_mat[1, 1]
+        # print(h_val)
+        df1 = pd.DataFrame(h_val, columns=['hi'])
+        filter = (df1['hi'] > 6 / nobs)
+        print("\nInfluential Observations by hi :")
+        print(df1['hi'].loc[filter])
+    else:
+        H = np.matmul(x_data, np.linalg.solve(
+            np.matmul(x_data.T, x_data), x_data.T))
+        df_w_h = df.copy().reset_index().rename(columns={'index': 'ID'})
+        df_w_h['ID'] += 1
+        df_w_h['h_ii'] = np.diagonal(H)
+        # print (x_data.shape[1])
+        k = x_data.shape[1]-1
+        n = len(df_w_h['h_ii'])
+        h_level = 3 * (k+1) / n
+        # print("h_level = ", h_level)
+        # print(" \n")
+        for i in range(0, df_w_h.shape[0]):
+            if df_w_h['h_ii'][i] > h_level:
+                infobs_index.append(i)
+        filter = (df_w_h['h_ii'] > h_level)
+        # print("Influential Observations by hi = \n")
+        # print(df_w_h['h_ii'].loc[filter])
+        return outlier_index, infobs_index
+
+
+##################### DEREK #####################
 # Outliers DIY
+
+
 def simple_outliers_DIY(df, xname, yname, alpha=0.05):
     # Fit regression model
     result = smf.ols(yname + '~' + xname, data=df).fit()
