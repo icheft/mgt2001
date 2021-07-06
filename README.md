@@ -26,6 +26,8 @@
 ## Intro
 The goal for this python package is to provide NTUIM students with an easier solution for Statistics courses, i.e. MGT2001 and MGT2002. This can be labelling issues in bar charts, generating a set of colors, and many more. Throughout the course, we hope to fill this package with useful and handy functions that can be used in the assignments, quizzes, and probably even for the future projects. 
 
+The official documentation for this package is available [here](https://icheft.github.io/mgt2001-docs).
+
 ## Getting Started
 ### Terminal
 Should be able to install the package via PyPI:
