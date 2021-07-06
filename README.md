@@ -19,8 +19,7 @@
   <a href="#demo">Intro</a> •
   <a href="#getting-started">Getting Started</a> •
   <a href="#how-to-use">Usage</a> •
-  <a href="#contribution">Contribution</a> •
-  <a href="#credits">Credits</a>
+  <a href="#contribution">Contribution</a>
 </p>
 
 ## Intro
@@ -61,3 +60,20 @@ or
 ```
 
 Which again depends on your needs.
+
+## How to Use
+
+Most of the usage is covered in the [documentation](https://icheft.github.io/mgt2001-docs) along with miscellaneous statistic notes. Feel free to play around.
+
+You can always get started from:
+
+```py
+import mgt2001
+```
+
+⚠️ For local development, try `pip install -e ./` in your Python environment. Will update more on this part later 🥵
+
+## Contribution
+
+PR and forking are all welcomed. Please help build the more perfect version of `mgt2001` that can help students learn statistics with ease.
+
